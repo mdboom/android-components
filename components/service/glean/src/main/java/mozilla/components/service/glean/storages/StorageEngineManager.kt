@@ -13,8 +13,8 @@ import org.json.JSONObject
  */
 internal class StorageEngineManager(
     private val storageEngines: Map<String, StorageEngine> = mapOf(
-        "events" to EventsStorageEngine,
-        "strings" to StringsStorageEngine
+        "event" to EventsStorageEngine,
+        "string" to StringsStorageEngine
     )
 ) {
     /**
