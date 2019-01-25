@@ -6,24 +6,34 @@ package org.mozilla.samples.glean
 
 import android.app.Application
 import mozilla.components.service.glean.Glean
+import mozilla.components.service.glean.config.Configuration
 import mozilla.components.support.base.log.Log
 import mozilla.components.support.base.log.sink.AndroidLogSink
+import mozilla.components.service.fretboard.declareExperiment
+import org.mozilla.samples.glean.metrics.Basic
+import org.mozilla.samples.glean.metrics.Test
 
 class GleanApplication : Application() {
-
     override fun onCreate() {
         super.onCreate()
+
+        var config = Configuration(
+            serverEndpoint = "",
+            logPings = true
+        )
 
         // We want the log messages of all builds to go to Android logcat
         Log.addSink(AndroidLogSink())
 
         // Initialize the Glean library. Ideally, this is the first thing that
         // must be done right after enabling logging.
-        Glean.initialize(applicationContext)
+        Glean.initialize(applicationContext, configuration = config)
 
-        GleanMetrics.Test.testTimespan.start()
+        declareExperiment()
+
+        Test.testTimespan.start()
 
         // Set a sample value for a metric.
-        GleanMetrics.Basic.os.set("Android")
+        Basic.os.set("Android")
     }
 }

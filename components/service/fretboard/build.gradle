@@ -2,6 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+plugins {
+    id "com.jetbrains.python.envs" version "0.0.26"
+}
+
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
@@ -28,7 +32,7 @@ dependencies {
 
     implementation project(':support-ktx')
     implementation project(':support-base')
-
+    implementation project(':service-glean')
 
     testImplementation Dependencies.testing_junit
     testImplementation Dependencies.testing_robolectric
@@ -41,3 +45,7 @@ dependencies {
 
 apply from: '../../../publish.gradle'
 ext.configurePublish(config.componentsGroupId, archivesBaseName, project.ext.description)
+
+apply from: '../glean/scripts/sdk_generator.gradle'
+
+

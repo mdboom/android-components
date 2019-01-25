@@ -5,6 +5,7 @@
 import org.apache.tools.ant.taskdefs.condition.Os
 
 String GLEAN_PARSER_VERSION = "0.12.0"
+String MINICONDA_VERSION = "4.5.11"
 
 /* This script runs a given Python module as a "main" module, like
  * `python -m module`. However, it first checks that the installed
@@ -44,13 +45,23 @@ subprocess.check_call([
 
 // Configure the Python environments
 envs {
-    bootstrapDirectory = new File(buildDir, 'bootstrap')
-    envsDirectory = new File(buildDir, 'envs')
+    File gleanDirectory = new File(
+        project.getGradle().gradleUserHomeDir,
+        "glean"
+    )
+    bootstrapDirectory = new File(
+        gleanDirectory,
+        "bootstrap-${MINICONDA_VERSION}"
+    )
+    envsDirectory = new File(
+        gleanDirectory,
+        "envs-${MINICONDA_VERSION}"
+    )
     pipInstallOptions = "--trusted-host pypi.python.org --no-cache-dir"
 
     // Setup a miniconda environment. conda is used because it works
     // non-interactively on Windows, unlike the other options
-    conda "Miniconda3", "Miniconda3-4.5.11", "64", ["glean_parser==${GLEAN_PARSER_VERSION}"]
+    conda "Miniconda3", "Miniconda3-${MINICONDA_VERSION}", "64", ["glean_parser==${GLEAN_PARSER_VERSION}"]
 }
 
 preBuild.finalizedBy("build_envs")
@@ -61,15 +72,20 @@ ext.gleanGenerateMetricsAPI = {
         variant ->
 
         def sourceOutputDir =  "$buildDir/telemetry/src/${variant.name}/kotlin"
+        def fullNamespace = "${variant.applicationId}.${namespace}"
         def generateKotlinAPI = task("generateMetricsSourceFor${variant.name.capitalize()}", type: Exec) {
             description = "Generate the Kotlin code for the Metrics API"
 
             workingDir  rootDir
+            def gleanMinicondaDir = new File(
+                project.getGradle().gradleUserHomeDir,
+                "glean/bootstrap-${MINICONDA_VERSION}/Miniconda3"
+            )
             // Note that the command line is OS dependant: on linux/mac is Miniconda3/bin/python.
             if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-                commandLine "$buildDir/bootstrap/Miniconda3/python"
+                commandLine new File(gleanMinicondaDir, "python")
             } else {
-                commandLine "$buildDir/bootstrap/Miniconda3/bin/python"
+                commandLine new File(gleanMinicondaDir, "bin/python")
             }
 
             args "-c"
@@ -82,7 +98,7 @@ ext.gleanGenerateMetricsAPI = {
             args "-o"
             args "$sourceOutputDir"
             args "-s"
-            args "namespace=$namespace"
+            args "namespace=$fullNamespace"
             args "$projectDir/metrics.yaml"
 
             // If we're building the Glean library itself (rather than an
@@ -118,7 +134,7 @@ ext.gleanGenerateMetricsAPI = {
 }
 
 if (android.hasProperty('applicationVariants')) {
-    android.applicationVariants.all(ext.gleanGenerateMetricsAPI('GleanMetrics'))
-} else if (project.name == 'service-glean') {
-    android.libraryVariants.all(ext.gleanGenerateMetricsAPI('mozilla.components.service.glean.metrics'))
+    android.applicationVariants.all(ext.gleanGenerateMetricsAPI('metrics'))
+} else {
+    android.libraryVariants.all(ext.gleanGenerateMetricsAPI('metrics'))
 }

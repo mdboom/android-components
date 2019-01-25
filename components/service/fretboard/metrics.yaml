@@ -1,0 +1,15 @@
+fretboard:
+  calls:
+    type: counter
+    lifetime: application
+    send_in_pings:
+      - baseline
+    description: |
+      A simple test counter
+    bugs:
+      - 00000000 
+    data_reviews:
+      - N/A
+    notification_emails:
+      - telemetry-client-dev@mozilla.com
+    

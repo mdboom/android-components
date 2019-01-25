@@ -5,7 +5,9 @@
 package mozilla.components.service.fretboard
 
 import android.content.Context
+import mozilla.components.service.glean.Glean
 import mozilla.components.support.base.log.logger.Logger
+import mozilla.components.service.fretboard.metrics.Fretboard as FretboardMetrics
 
 /**
  * Entry point of the library
@@ -198,4 +200,9 @@ class Fretboard(
     companion object {
         private const val LOG_TAG = "fretboard"
     }
+}
+
+fun declareExperiment() {
+    FretboardMetrics.calls.add()
+    Glean.setExperimentActive("FretboardIntegrationExperiment", "special")
 }

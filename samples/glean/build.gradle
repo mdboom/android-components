@@ -29,11 +29,16 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    packagingOptions {
+         exclude 'META-INF/proguard/androidx-annotations.pro'
+    }
 }
 
 dependencies {
     implementation project(':service-glean')
     implementation project(':support-base')
+    implementation project(':service-fretboard')
 
     implementation Dependencies.kotlin_stdlib
     implementation Dependencies.kotlin_coroutines

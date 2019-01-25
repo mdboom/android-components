@@ -4,6 +4,18 @@
 
 $schema: moz://mozilla.org/schemas/glean/metrics/1-0-0
 
+test:
+  simple_counter:
+    type: counter
+    description: |
+      A counter that can be incremented by third-party libraries
+    bugs:
+      - 12345678
+    data_reviews:
+      - N/A
+    notification_emails:
+      - telemetry-client-dev@mozilla.com
+
 glean.baseline:
   ## TODO: Some metrics are commented out below until we implement them as part
   ## of 1497894 and its dependent bugs
