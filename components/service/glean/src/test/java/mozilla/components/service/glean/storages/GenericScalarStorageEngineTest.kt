@@ -101,16 +101,16 @@ class GenericScalarStorageEngineTest {
         // Take a snapshot and clear the store: this snapshot must contain the data for
         // both metrics.
         val firstSnapshot = storageEngine.getSnapshot(storeName = "store1", clearStore = true)
-        assertEquals(2, firstSnapshot!!.size)
-        assertEquals(dataUserLifetime, firstSnapshot["telemetry.userLifetimeData"])
-        assertEquals(dataPingLifetime, firstSnapshot["telemetry.pingLifetimeData"])
+        assertEquals(2, firstSnapshot.first!!.size)
+        assertEquals(dataUserLifetime, firstSnapshot.first!!["telemetry.userLifetimeData"])
+        assertEquals(dataPingLifetime, firstSnapshot.first!!["telemetry.pingLifetimeData"])
 
         // Take a new snapshot. The ping lifetime data should have been cleared and not be
         // available anymore, data with 'user' lifetime must still be around.
         val secondSnapshot = storageEngine.getSnapshot(storeName = "store1", clearStore = true)
-        assertEquals(1, secondSnapshot!!.size)
-        assertEquals(dataUserLifetime, secondSnapshot["telemetry.userLifetimeData"])
-        assertFalse(secondSnapshot.contains("telemetry.pingLifetimeData"))
+        assertEquals(1, secondSnapshot.first!!.size)
+        assertEquals(dataUserLifetime, secondSnapshot.first!!["telemetry.userLifetimeData"])
+        assertFalse(secondSnapshot.first!!.contains("telemetry.pingLifetimeData"))
     }
 
     @Test
@@ -135,8 +135,8 @@ class GenericScalarStorageEngineTest {
         // Take a snapshot and clear the store: this snapshot must contain the data for
         // both metrics.
         val snapshot = storageEngine.getSnapshot(storeName = "store1", clearStore = true)
-        assertEquals(1, snapshot!!.size)
-        assertEquals(37, snapshot["noCategoryName"])
+        assertEquals(1, snapshot.first!!.size)
+        assertEquals(37, snapshot.first!!["noCategoryName"])
     }
 
     @Test
@@ -216,8 +216,8 @@ class GenericScalarStorageEngineTest {
         )
 
         val snapshot = storageEngine.getSnapshot(storeName = "store1", clearStore = true)
-        assertEquals(1, snapshot!!.size)
-        assertEquals(37, snapshot["telemetry.pingLifetimeData"])
+        assertEquals(1, snapshot.first!!.size)
+        assertEquals(37, snapshot.first!!["telemetry.pingLifetimeData"])
     }
 
     @Test
@@ -243,8 +243,8 @@ class GenericScalarStorageEngineTest {
         storageEngine.applicationContext = context
 
         val snapshot = storageEngine.getSnapshot(storeName = "store_name", clearStore = true)
-        assertEquals(1, snapshot!!.size)
-        assertEquals(11, snapshot["telemetry.value1"])
+        assertEquals(1, snapshot.first!!.size)
+        assertEquals(11, snapshot.first!!["telemetry.value1"])
     }
 
     @Test
@@ -294,13 +294,13 @@ class GenericScalarStorageEngineTest {
         storageEngine.applicationContext = context
 
         val store1Snapshot = storageEngine.getSnapshot(storeName = "store1", clearStore = true)
-        assertEquals(2, store1Snapshot!!.size)
-        assertEquals(1, store1Snapshot["telemetry.value1"])
-        assertEquals(2, store1Snapshot["telemetry.value2"])
+        assertEquals(2, store1Snapshot.first!!.size)
+        assertEquals(1, store1Snapshot.first!!["telemetry.value1"])
+        assertEquals(2, store1Snapshot.first!!["telemetry.value2"])
 
         val store2Snapshot = storageEngine.getSnapshot(storeName = "store2", clearStore = true)
-        assertEquals(1, store2Snapshot!!.size)
-        assertEquals(1, store2Snapshot["telemetry.value1"])
+        assertEquals(1, store2Snapshot.first!!.size)
+        assertEquals(1, store2Snapshot.first!!["telemetry.value1"])
     }
 
     @Test
@@ -356,17 +356,17 @@ class GenericScalarStorageEngineTest {
             // Get a first snapshot: it will clear the "ping" lifetime for the
             // requested store.
             val snapshot1 = storageEngine.getSnapshot(storeName = store, clearStore = true)
-            assertEquals(3, snapshot1!!.size)
-            assertEquals(11, snapshot1["telemetry.userLifetimeData"])
-            assertEquals(7, snapshot1["telemetry.applicationLifetimeData"])
-            assertEquals(2015, snapshot1["telemetry.pingLifetimeData"])
+            assertEquals(3, snapshot1.first!!.size)
+            assertEquals(11, snapshot1.first!!["telemetry.userLifetimeData"])
+            assertEquals(7, snapshot1.first!!["telemetry.applicationLifetimeData"])
+            assertEquals(2015, snapshot1.first!!["telemetry.pingLifetimeData"])
 
             // A new snapshot should not contain data with "ping" lifetime, since it was
             // previously cleared.
             val snapshot2 = storageEngine.getSnapshot(storeName = store, clearStore = true)
-            assertEquals(2, snapshot2!!.size)
-            assertEquals(11, snapshot2["telemetry.userLifetimeData"])
-            assertEquals(7, snapshot2["telemetry.applicationLifetimeData"])
+            assertEquals(2, snapshot2.first!!.size)
+            assertEquals(11, snapshot2.first!!["telemetry.userLifetimeData"])
+            assertEquals(7, snapshot2.first!!["telemetry.applicationLifetimeData"])
         }
     }
 
@@ -409,9 +409,9 @@ class GenericScalarStorageEngineTest {
 
             // Make sure the data was recorded without clearing the storage.
             val snapshot = storageEngine.getSnapshot("store1", false)
-            assertEquals(2, snapshot!!.size)
-            assertEquals(37, snapshot["telemetry.userLifetimeData"])
-            assertEquals(85, snapshot["telemetry.applicationLifetimeData"])
+            assertEquals(2, snapshot.first!!.size)
+            assertEquals(37, snapshot.first!!["telemetry.userLifetimeData"])
+            assertEquals(85, snapshot.first!!["telemetry.applicationLifetimeData"])
         }
 
         // Re-instantiate the engine: application lifetime probes should have been cleared.
@@ -420,8 +420,8 @@ class GenericScalarStorageEngineTest {
             storageEngine.applicationContext = ApplicationProvider.getApplicationContext()
 
             val snapshot = storageEngine.getSnapshot("store1", true)
-            assertEquals(1, snapshot!!.size)
-            assertEquals(37, snapshot["telemetry.userLifetimeData"])
+            assertEquals(1, snapshot.first!!.size)
+            assertEquals(37, snapshot.first!!["telemetry.userLifetimeData"])
         }
     }
 }

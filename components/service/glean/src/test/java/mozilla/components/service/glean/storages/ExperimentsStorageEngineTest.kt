@@ -119,7 +119,7 @@ class ExperimentsStorageEngineTest {
         )
         assertEquals(
             "{\"experiment_1\":{\"branch\":\"branch_a\"},\"experiment_2\":{\"branch\":\"branch_c\",\"extra\":{\"extra_key_1\":\"extra_val_1\"}}}",
-            json.toString()
+            json.first!!.toString()
         )
     }
 }

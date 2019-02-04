@@ -193,6 +193,17 @@ internal open class TimespansStorageEngineImplementation(
         uncommittedStartTimes.remove(getStoredName(metricData))
     }
 
+    private fun adjustTimeUnit(metricKey: String, value: Long): Pair<String, Long> {
+        // Convert to the expected time unit.
+        if (metricKey !in timeUnitsMap) {
+            logger.error("Can't find the time unit for ${metricKey}. Reporting raw value.")
+        }
+
+        return timeUnitsMap[metricKey]?.let { timeUnit ->
+            Pair(timeUnit.name.toLowerCase(), getAdjustedTime(timeUnit, value))
+        } ?: Pair("unknown", value)
+    }
+
     /**
      * Get a snapshot of the stored timespans and adjust it to the desired time units.
      *
@@ -203,31 +214,19 @@ internal open class TimespansStorageEngineImplementation(
      * @return the [Long] recorded in the requested store
      */
     @Synchronized
-    internal fun getSnapshotWithTimeUnit(storeName: String, clearStore: Boolean): Map<String, Pair<String, Long>>? {
-        val adjustedData = super.getSnapshot(storeName, clearStore)
-            ?.mapValuesTo(mutableMapOf<String, Pair<String, Long>>()) {
-            // Convert to the expected time unit.
-            if (it.key !in timeUnitsMap) {
-                logger.error("Can't find the time unit for ${it.key}. Reporting raw value.")
+    internal fun getSnapshotWithTimeUnit(storeName: String, clearStore: Boolean): Pair<Map<String, Pair<String, Long>>?, Map<String, Map<String, Pair<String, Long>>>?> {
+        val snapshot = super.getSnapshot(storeName, clearStore)
+        return Pair(
+            snapshot.first?.mapValuesTo(mutableMapOf<String, Pair<String, Long>>()) {
+                adjustTimeUnit(it.key, it.value)
+            },
+            snapshot.second?.mapValuesTo(mutableMapOf<String, MutableMap<String, Pair<String, Long>>>()) {
+                outer ->
+                outer.value.mapValuesTo(mutableMapOf<String, Pair<String, Long>>()) {
+                    adjustTimeUnit(outer.key, it.value)
+                }
             }
-
-            timeUnitsMap[it.key]?.let { timeUnit ->
-                Pair(timeUnit.name.toLowerCase(), getAdjustedTime(timeUnit, it.value))
-            } ?: Pair("unknown", it.value)
-        }
-
-        // Clear the time unit map if needed: we need to check all the stores
-        // for all the lifetimes.
-        if (clearStore) {
-            // Get a list of the metrics that are still stored. We'll drop the time units for all the
-            // metrics that are not in this set.
-            val unclearedMetricNames =
-                dataStores.flatMap { lifetime -> lifetime.entries }.flatMap { it -> it.value.keys }.toSet()
-
-            timeUnitsMap.keys.retainAll { it in unclearedMetricNames }
-        }
-
-        return adjustedData
+        )
     }
 
     /**
@@ -239,15 +238,27 @@ internal open class TimespansStorageEngineImplementation(
      *
      * @return the [JSONObject] containing the recorded data.
      */
-    override fun getSnapshotAsJSON(storeName: String, clearStore: Boolean): Any? {
-        return getSnapshotWithTimeUnit(storeName, clearStore)?.let { dataMap ->
-            return JSONObject(dataMap.mapValuesTo(mutableMapOf<String, JSONObject>()) {
+    override fun getSnapshotAsJSON(storeName: String, clearStore: Boolean): Pair<Any?, Any?> {
+        val snapshot = getSnapshotWithTimeUnit(storeName, clearStore)
+        val unlabeled = snapshot.first?.let { 
+            JSONObject(it.mapValuesTo(mutableMapOf<String, JSONObject>()) {
                 JSONObject(mapOf(
                     "time_unit" to it.value.first,
                     "value" to it.value.second
                 ))
             })
         }
+        val labeled = snapshot.second?.let {
+            JSONObject(it.mapValuesTo(mutableMapOf<String, MutableMap<String, JSONObject>>()) {
+                it.value.mapValuesTo(mutableMapOf<String, JSONObject>()) {
+                    JSONObject(mapOf(
+                        "time_unit" to it.value.first,
+                        "value" to it.value.second
+                    ))
+                }
+            })
+        }
+        return Pair(unlabeled, labeled)
     }
 
     /**

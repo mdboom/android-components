@@ -81,8 +81,8 @@ class TimespansStorageEngineTest {
 
         storageEngine.applicationContext = context
         val snapshot = storageEngine.getSnapshotWithTimeUnit(storeName = "store1", clearStore = true)
-        assertEquals(1, snapshot!!.size)
-        assertEquals(Pair("nanosecond", expectedValue), snapshot["telemetry.valid"])
+        assertEquals(1, snapshot.first!!.size)
+        assertEquals(Pair("nanosecond", expectedValue), snapshot.first!!["telemetry.valid"])
     }
 
     @Test
@@ -108,8 +108,8 @@ class TimespansStorageEngineTest {
         spiedEngine.stopAndSum(metric, TimeUnit.Nanosecond)
 
         val snapshot = spiedEngine.getSnapshotWithTimeUnit(storeName = "store1", clearStore = false)
-        assertEquals(1, snapshot!!.size)
-        assertEquals(Pair("nanosecond", expectedTimespanNanos), snapshot["telemetry.single_elapsed_test"])
+        assertEquals(1, snapshot.first!!.size)
+        assertEquals(Pair("nanosecond", expectedTimespanNanos), snapshot.first!!["telemetry.single_elapsed_test"])
     }
 
     @Test
@@ -138,8 +138,8 @@ class TimespansStorageEngineTest {
         spiedEngine.stopAndSum(metric, TimeUnit.Nanosecond)
 
         val snapshot = spiedEngine.getSnapshotWithTimeUnit(storeName = "store1", clearStore = false)
-        assertEquals(1, snapshot!!.size)
-        assertEquals(Pair("nanosecond", expectedChunkNanos * 2), snapshot["telemetry.single_elapsed_test"])
+        assertEquals(1, snapshot.first!!.size)
+        assertEquals(Pair("nanosecond", expectedChunkNanos * 2), snapshot.first!!["telemetry.single_elapsed_test"])
     }
 
     @Test
@@ -187,10 +187,10 @@ class TimespansStorageEngineTest {
         spiedEngine.stopAndSum(metric, TimeUnit.Nanosecond)
 
         val snapshot = spiedEngine.getSnapshotWithTimeUnit(storeName = "store1", clearStore = false)
-        assertEquals(1, snapshot!!.size)
+        assertEquals(1, snapshot.first!!.size)
         assertEquals(
             Pair("nanosecond", expectedChunkNanos),
-            snapshot["telemetry.single_elapsed_test"]
+            snapshot.first!!["telemetry.single_elapsed_test"]
         )
     }
 
@@ -218,7 +218,7 @@ class TimespansStorageEngineTest {
         spiedEngine.stopAndSum(metric, TimeUnit.Nanosecond)
 
         val snapshot = spiedEngine.getSnapshotWithTimeUnit(storeName = "store1", clearStore = false)
-        assertNull(snapshot)
+        assertNull(snapshot.first)
     }
 
     @Test
@@ -251,8 +251,8 @@ class TimespansStorageEngineTest {
             spiedEngine.stopAndSum(metric, res)
 
             val snapshot = spiedEngine.getSnapshotWithTimeUnit(storeName = "store1", clearStore = true)
-            assertEquals(1, snapshot!!.size)
-            assertEquals(Pair(res.name.toLowerCase(), expectedTimespan), snapshot["telemetry.resolution_test"])
+            assertEquals(1, snapshot.first!!.size)
+            assertEquals(Pair(res.name.toLowerCase(), expectedTimespan), snapshot.first!!["telemetry.resolution_test"])
         }
     }
 
@@ -288,10 +288,10 @@ class TimespansStorageEngineTest {
         // Since the sum of the short-lived timespans is >= our resolution, we
         // expect the accumulated value to be in the snapshot.
         val snapshot = spiedEngine.getSnapshotWithTimeUnit(storeName = "store1", clearStore = true)
-        assertEquals(1, snapshot!!.size)
+        assertEquals(1, snapshot.first!!.size)
         assertEquals(
             Pair("second", expectedTimespanSeconds),
-            snapshot["telemetry.many_short_lived_test"]
+            snapshot.first!!["telemetry.many_short_lived_test"]
         )
     }
 }

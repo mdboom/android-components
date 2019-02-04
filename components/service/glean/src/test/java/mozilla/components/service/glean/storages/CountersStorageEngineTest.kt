@@ -57,8 +57,8 @@ class CountersStorageEngineTest {
 
         storageEngine.applicationContext = context
         val snapshot = storageEngine.getSnapshot(storeName = "store1", clearStore = true)
-        assertEquals(1, snapshot!!.size)
-        assertEquals(1, snapshot["telemetry.valid"])
+        assertEquals(1, snapshot.first!!.size)
+        assertEquals(1, snapshot.first!!["telemetry.valid"])
     }
 
     @Test
@@ -84,7 +84,7 @@ class CountersStorageEngineTest {
             // Get the snapshot from "store1" and clear it.
             val snapshot = storageEngine.getSnapshotAsJSON(storeName = "store1", clearStore = true)
             // Check that this serializes to the expected JSON format.
-            assertEquals("{\"telemetry.counter_metric\":1}", snapshot.toString())
+            assertEquals("{\"telemetry.counter_metric\":1}", snapshot.first.toString())
         }
 
         // Re-instantiate storage engine to validate serialization from storage rather than cache
@@ -95,7 +95,7 @@ class CountersStorageEngineTest {
             // Get the snapshot from "store1" and clear it.
             val snapshot = storageEngine.getSnapshotAsJSON(storeName = "store1", clearStore = true)
             // Check that this serializes to the expected JSON format.
-            assertEquals("{\"telemetry.counter_metric\":1}", snapshot.toString())
+            assertEquals("{\"telemetry.counter_metric\":1}", snapshot.first!!.toString())
         }
     }
 
@@ -120,15 +120,15 @@ class CountersStorageEngineTest {
         // Check that the data was correctly set in each store.
         for (storeName in storeNames) {
             val snapshot = CountersStorageEngine.getSnapshot(storeName = storeName, clearStore = false)
-            assertEquals(1, snapshot!!.size)
-            assertEquals(1, snapshot.get("telemetry.counter_metric"))
+            assertEquals(1, snapshot.first!!.size)
+            assertEquals(1, snapshot.first!!.get("telemetry.counter_metric"))
         }
     }
 
     @Test
     fun `getSnapshot() returns null if nothing is recorded in the store`() {
         assertNull("The engine must report 'null' on empty or unknown stores",
-                CountersStorageEngine.getSnapshot(storeName = "unknownStore", clearStore = false))
+                CountersStorageEngine.getSnapshot(storeName = "unknownStore", clearStore = false).first)
     }
 
     @Test
@@ -153,13 +153,13 @@ class CountersStorageEngineTest {
         val snapshot = CountersStorageEngine.getSnapshot(storeName = "store1", clearStore = true)
         // Check that getting a new snapshot for "store1" returns an empty store.
         assertNull("The engine must report 'null' on empty stores",
-                CountersStorageEngine.getSnapshot(storeName = "store1", clearStore = false))
+                CountersStorageEngine.getSnapshot(storeName = "store1", clearStore = false).first)
 
         // Check that we get the right data from both the stores. Clearing "store1" must
         // not clear "store2" as well.
         val snapshot2 = CountersStorageEngine.getSnapshot(storeName = "store2", clearStore = false)
         for (s in listOf(snapshot, snapshot2)) {
-            assertEquals(1, s!!.size)
+            assertEquals(1, s.first!!.size)
         }
     }
 
@@ -183,9 +183,9 @@ class CountersStorageEngineTest {
         val snapshot = CountersStorageEngine.getSnapshotAsJSON(storeName = "store1", clearStore = true)
         // Check that getting a new snapshot for "store1" returns an empty store.
         assertNull("The engine must report 'null' on empty stores",
-            CountersStorageEngine.getSnapshotAsJSON(storeName = "store1", clearStore = false))
+            CountersStorageEngine.getSnapshotAsJSON(storeName = "store1", clearStore = false).first)
         // Check that this serializes to the expected JSON format.
         assertEquals("{\"telemetry.counter_metric\":1}",
-            snapshot.toString())
+            snapshot.first.toString())
     }
 }

@@ -44,16 +44,11 @@ internal class StorageEngineManager(
         for ((sectionName, engine) in storageEngines) {
             val engineData = engine.getSnapshotAsJSON(storeName, clearStore = true)
             if (engine.sendAsTopLevelField) {
-                jsonPing.put(sectionName, engineData)
+                jsonPing.put(sectionName, engineData.first)
+                jsonPing.put("labeled_$sectionName", engineData.second)
             } else {
-                metricsSection.put(sectionName, engineData)
-            }
-
-            val labeledEngineData = engine.getLabeledSnapshotAsJSON(storeName, clearStore = true)
-            if (engine.sendAsTopLevelField) {
-                jsonPing.put("labeled_$sectionName", labeledEngineData)
-            } else {
-                metricsSection.put("labeled_$sectionName", labeledEngineData)
+                metricsSection.put(sectionName, engineData.first)
+                metricsSection.put("labeled_$sectionName", engineData.second)
             }
         }
         if (metricsSection.length() != 0) {

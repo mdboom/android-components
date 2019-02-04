@@ -55,8 +55,8 @@ class BooleansStorageEngineTest {
 
         storageEngine.applicationContext = context
         val snapshot = storageEngine.getSnapshot(storeName = "store1", clearStore = true)
-        assertEquals(1, snapshot!!.size)
-        assertEquals(true, snapshot["telemetry.bool"])
+        assertEquals(1, snapshot.first!!.size)
+        assertEquals(true, snapshot.first!!["telemetry.bool"])
     }
 
     @Test
@@ -84,7 +84,7 @@ class BooleansStorageEngineTest {
                 clearStore = true)
             // Check that this serializes to the expected JSON format.
             assertEquals("{\"telemetry.boolean_metric\":true}",
-                snapshot.toString())
+                snapshot.first!!.toString())
         }
 
         // Create a new instance of storage engine to verify serialization to storage rather than
@@ -98,7 +98,7 @@ class BooleansStorageEngineTest {
                 clearStore = true)
             // Check that this serializes to the expected JSON format.
             assertEquals("{\"telemetry.boolean_metric\":true}",
-                snapshot.toString())
+                snapshot.first!!.toString())
         }
     }
 
@@ -123,15 +123,15 @@ class BooleansStorageEngineTest {
         // Check that the data was correctly set in each store.
         for (storeName in storeNames) {
             val snapshot = BooleansStorageEngine.getSnapshot(storeName = storeName, clearStore = false)
-            assertEquals(1, snapshot!!.size)
-            assertEquals(true, snapshot.get("telemetry.boolean_metric"))
+            assertEquals(1, snapshot.first!!.size)
+            assertEquals(true, snapshot.first!!.get("telemetry.boolean_metric"))
         }
     }
 
     @Test
     fun `getSnapshot() returns null if nothing is recorded in the store`() {
         assertNull("The engine must report 'null' on empty or unknown stores",
-            BooleansStorageEngine.getSnapshot(storeName = "unknownStore", clearStore = false))
+            BooleansStorageEngine.getSnapshot(storeName = "unknownStore", clearStore = false).first)
     }
 
     @Test
@@ -156,13 +156,13 @@ class BooleansStorageEngineTest {
         val snapshot = BooleansStorageEngine.getSnapshot(storeName = "store1", clearStore = true)
         // Check that getting a new snapshot for "store1" returns an empty store.
         assertNull("The engine must report 'null' on empty stores",
-            BooleansStorageEngine.getSnapshot(storeName = "store1", clearStore = false))
+            BooleansStorageEngine.getSnapshot(storeName = "store1", clearStore = false).first)
 
         // Check that we get the right data from both the stores. Clearing "store1" must
         // not clear "store2" as well.
         val snapshot2 = BooleansStorageEngine.getSnapshot(storeName = "store2", clearStore = false)
         for (s in listOf(snapshot, snapshot2)) {
-            assertEquals(1, s!!.size)
+            assertEquals(1, s.first!!.size)
         }
     }
 
@@ -186,9 +186,9 @@ class BooleansStorageEngineTest {
         val snapshot = BooleansStorageEngine.getSnapshotAsJSON(storeName = "store1", clearStore = true)
         // Check that getting a new snapshot for "store1" returns an empty store.
         assertNull("The engine must report 'null' on empty stores",
-            BooleansStorageEngine.getSnapshotAsJSON(storeName = "store1", clearStore = false))
+            BooleansStorageEngine.getSnapshotAsJSON(storeName = "store1", clearStore = false).first)
         // Check that this serializes to the expected JSON format.
         assertEquals("{\"telemetry.boolean_metric\":true}",
-            snapshot.toString())
+            snapshot.first!!.toString())
     }
 }

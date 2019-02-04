@@ -72,7 +72,7 @@ class GleanTest {
         stringMetric.set("foo")
         assertNull(
                 "Metrics should not be recorded if glean is disabled",
-                StringsStorageEngine.getSnapshot(storeName = "store1", clearStore = false)
+                StringsStorageEngine.getSnapshot(storeName = "store1", clearStore = false).first
         )
     }
 
@@ -338,7 +338,7 @@ class GleanTest {
         stringMetric.set("foo")
         assertNull(
             "Metrics should not be recorded if glean is not initialized",
-            StringsStorageEngine.getSnapshot(storeName = "store1", clearStore = false)
+            StringsStorageEngine.getSnapshot(storeName = "store1", clearStore = false).first
         )
 
         Glean.initialized = true

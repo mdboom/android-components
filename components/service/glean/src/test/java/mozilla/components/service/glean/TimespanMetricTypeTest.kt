@@ -46,9 +46,9 @@ class TimespanMetricTypeTest {
 
         // Check that data was properly recorded.
         val snapshot = TimespansStorageEngine.getSnapshot(storeName = "store1", clearStore = false)
-        assertEquals(1, snapshot!!.size)
-        assertTrue("telemetry.timespan_metric" in snapshot)
-        assertTrue(snapshot["telemetry.timespan_metric"]!! >= 0)
+        assertEquals(1, snapshot.first!!.size)
+        assertTrue("telemetry.timespan_metric" in snapshot.first!!)
+        assertTrue(snapshot.first!!["telemetry.timespan_metric"]!! >= 0)
     }
 
     @Test
@@ -72,7 +72,7 @@ class TimespanMetricTypeTest {
 
         // Check that data was not recorded.
         val snapshot = TimespansStorageEngine.getSnapshot(storeName = "store1", clearStore = false)
-        assertNull(snapshot)
+        assertNull(snapshot.first)
     }
 
     @Test
@@ -94,6 +94,6 @@ class TimespanMetricTypeTest {
 
         // Check that data was not recorded.
         val snapshot = TimespansStorageEngine.getSnapshot(storeName = "store1", clearStore = false)
-        assertNull(snapshot)
+        assertNull(snapshot.first)
     }
 }

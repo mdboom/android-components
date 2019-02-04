@@ -167,10 +167,10 @@ class EventsStorageEngineTest {
         val snapshot = EventsStorageEngine.getSnapshotAsJSON(storeName = "store1", clearStore = true)
         // Check that getting a new snapshot for "store1" returns an empty store.
         assertNull("The engine must report 'null' on empty stores",
-            EventsStorageEngine.getSnapshotAsJSON(storeName = "store1", clearStore = false))
+            EventsStorageEngine.getSnapshotAsJSON(storeName = "store1", clearStore = false).first)
         // Check that this serializes to the expected JSON format.
         assertEquals("[[0,\"telemetry\",\"test_event_clear\",\"test_event_object\",null,null]]",
-            snapshot.toString())
+            snapshot.first!!.toString())
     }
 
     @Test

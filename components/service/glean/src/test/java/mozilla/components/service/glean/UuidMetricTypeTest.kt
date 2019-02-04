@@ -55,18 +55,18 @@ class UuidMetricTypeTest {
 
         // Check that data was properly recorded.
         val snapshot = UuidsStorageEngine.getSnapshot(storeName = "store1", clearStore = false)
-        assertEquals(1, snapshot!!.size)
-        assertEquals(true, snapshot.containsKey("telemetry.uuid_metric"))
-        assertEquals(uuid, snapshot.get("telemetry.uuid_metric"))
+        assertEquals(1, snapshot.first!!.size)
+        assertEquals(true, snapshot.first!!.containsKey("telemetry.uuid_metric"))
+        assertEquals(uuid, snapshot.first!!.get("telemetry.uuid_metric"))
 
         val uuid2 = UUID.fromString("ce2adeb8-843a-4232-87a5-a099ed1e7bb3")
         uuidMetric.set(uuid2)
 
         // Check that data was properly recorded.
         val snapshot2 = UuidsStorageEngine.getSnapshot(storeName = "store1", clearStore = false)
-        assertEquals(1, snapshot2!!.size)
-        assertEquals(true, snapshot2.containsKey("telemetry.uuid_metric"))
-        assertEquals(uuid2, snapshot2.get("telemetry.uuid_metric"))
+        assertEquals(1, snapshot2.first!!.size)
+        assertEquals(true, snapshot2.first!!.containsKey("telemetry.uuid_metric"))
+        assertEquals(uuid2, snapshot2.first!!.get("telemetry.uuid_metric"))
     }
 
     @Test
@@ -85,7 +85,7 @@ class UuidMetricTypeTest {
         uuidMetric.generateAndSet()
         // Check that nothing was recorded.
         val snapshot = UuidsStorageEngine.getSnapshot(storeName = "store1", clearStore = false)
-        assertNull("Uuids must not be recorded if they are disabled", snapshot)
+        assertNull("Uuids must not be recorded if they are disabled", snapshot.first)
     }
 
     @Test
@@ -104,6 +104,6 @@ class UuidMetricTypeTest {
         uuidMetric.generateAndSet()
         // Check that nothing was recorded.
         val snapshot = UuidsStorageEngine.getSnapshot(storeName = "store1", clearStore = false)
-        assertNull("Uuids must not be recorded if they are disabled", snapshot)
+        assertNull("Uuids must not be recorded if they are disabled", snapshot.first)
     }
 }

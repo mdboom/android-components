@@ -161,8 +161,10 @@ abstract class GenericScalarStorageEngine<ScalarType> : StorageEngine {
      * @return the [ScalarType] recorded in the requested store
      */
     @Synchronized
-    fun getSnapshot(storeName: String, clearStore: Boolean): GenericDataStorage<ScalarType>? {
+    fun getSnapshot(storeName: String, clearStore: Boolean):
+        Pair<GenericDataStorage<ScalarType>?, GenericDataStorage<MutableMap<String, ScalarType>>?> {
         val allLifetimes: GenericDataStorage<ScalarType> = mutableMapOf()
+        val labeledAllLifetimes: GenericDataStorage<MutableMap<String, ScalarType>> = mutableMapOf()
 
         // Make sure data with "user" lifetime is loaded before getting the snapshot.
         // We still need to catch exceptions here, as `getAll()` might throw.
@@ -176,71 +178,17 @@ abstract class GenericScalarStorageEngine<ScalarType> : StorageEngine {
         // Get the metrics for all the supported lifetimes.
         for (store in dataStores) {
             store[storeName]?.let {
-                it.filter { !isLabeledMetric(it.key) }
-                    .map { allLifetimes.put(it.key, it.value) }
-            }
-        }
-
-        if (clearStore) {
-            // We only allow clearing metrics with the "ping" lifetime.
-            dataStores[Lifetime.Ping.ordinal].remove(storeName)
-        }
-
-        return if (allLifetimes.isNotEmpty()) allLifetimes else null
-    }
-
-    /**
-     * Get a snapshot of the stored data as a JSON object.
-     *
-     * @param storeName the name of the desired store
-     * @param clearStore whether or not to clearStore the requested store
-     *
-     * @return the [JSONObject] containing the recorded data.
-     */
-    override fun getSnapshotAsJSON(storeName: String, clearStore: Boolean): Any? {
-        return getSnapshot(storeName, clearStore)?.let { dataMap ->
-            return JSONObject(dataMap)
-        }
-    }
-
-    /**
-     * Retrieves the [recorded metric data][ScalarType] for the labeled metrics of
-     * the provided store name.
-     *
-     * Please note that the [Lifetime.Application] lifetime is handled implicitly
-     * by never clearing its data. It will naturally clear out when restarting the
-     * application.
-     *
-     * @param storeName the name of the desired store
-     * @param clearStore whether or not to clear the requested store. Not that only
-     *        metrics stored with a lifetime of [Lifetime.Ping] will be cleared.
-     *
-     * @return the [ScalarType] recorded in the requested store
-     */
-    @Synchronized
-    fun getLabeledSnapshot(storeName: String, clearStore: Boolean): GenericDataStorage<MutableMap<String, ScalarType>>? {
-        val allLifetimes: GenericDataStorage<MutableMap<String, ScalarType>> = mutableMapOf()
-
-        // Make sure data with "user" lifetime is loaded before getting the snapshot.
-        // We still need to catch exceptions here, as `getAll()` might throw.
-        @Suppress("TooGenericExceptionCaught")
-        try {
-            userLifetimeStorage.all
-        } catch (e: NullPointerException) {
-            // Intentionally left blank. We just want to fall through.
-        }
-
-        // Get the metrics for all the supported lifetimes.
-        for (store in dataStores) {
-            store[storeName]?.let {
-                it.filter { isLabeledMetric(it.key) }
-                    .map {
+                it.map {
+                    if (isLabeledMetric(it.key)) {
                         var parts = parseLabeledMetric(it.key)
-                        (allLifetimes.getOrElse(parts.first) { mutableMapOf() }).put(
+                        (labeledAllLifetimes.getOrElse(parts.first) { mutableMapOf() }).put(
                             parts.second,
                             it.value
                         )
+                    } else {
+                        allLifetimes.put(it.key, it.value)
                     }
+                }
             }
         }
 
@@ -249,7 +197,10 @@ abstract class GenericScalarStorageEngine<ScalarType> : StorageEngine {
             dataStores[Lifetime.Ping.ordinal].remove(storeName)
         }
 
-        return if (allLifetimes.isNotEmpty()) allLifetimes else null
+        return Pair(
+            if (allLifetimes.isNotEmpty()) allLifetimes else null,
+            if (labeledAllLifetimes.isNotEmpty()) labeledAllLifetimes else null
+        )
     }
 
     /**
@@ -260,10 +211,12 @@ abstract class GenericScalarStorageEngine<ScalarType> : StorageEngine {
      *
      * @return the [JSONObject] containing the recorded data.
      */
-    override fun getLabeledSnapshotAsJSON(storeName: String, clearStore: Boolean): Any? {
-        return getLabeledSnapshot(storeName, clearStore)?.let { dataMap ->
-            return JSONObject(dataMap)
-        }
+    override fun getSnapshotAsJSON(storeName: String, clearStore: Boolean): Pair<Any?, Any?> {
+        val snapshot = getSnapshot(storeName, clearStore)
+        return Pair(
+            if (snapshot.first !== null) JSONObject(snapshot.first) else null,
+            if (snapshot.second !== null) JSONObject(snapshot.second) else null
+        )
     }
 
     /**

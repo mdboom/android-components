@@ -104,8 +104,8 @@ internal object EventsStorageEngine : StorageEngine {
      *
      * @return the JSONArray containing the recorded data
      */
-    override fun getSnapshotAsJSON(storeName: String, clearStore: Boolean): Any? {
-        return getSnapshot(storeName, clearStore)?.let { pingEvents ->
+    override fun getSnapshotAsJSON(storeName: String, clearStore: Boolean): Pair<Any?, Any?> {
+        getSnapshot(storeName, clearStore)?.let { pingEvents ->
             val eventsArray = JSONArray()
             pingEvents.forEach {
                 val eventData = JSONArray()
@@ -117,8 +117,9 @@ internal object EventsStorageEngine : StorageEngine {
                 eventData.put(it.extra)
                 eventsArray.put(eventData)
             }
-            return eventsArray
+            return Pair(eventsArray, null)
         }
+        return Pair(null, null)
     }
 
     override val sendAsTopLevelField: Boolean

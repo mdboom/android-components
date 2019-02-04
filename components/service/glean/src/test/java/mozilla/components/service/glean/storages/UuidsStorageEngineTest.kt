@@ -57,8 +57,8 @@ class UuidsStorageEngineTest {
 
         storageEngine.applicationContext = context
         val snapshot = storageEngine.getSnapshot(storeName = "store1", clearStore = true)
-        assertEquals(1, snapshot!!.size)
-        assertEquals("ce2adeb8-843a-4232-87a5-a099ed1e7bb3", snapshot["telemetry.valid"].toString())
+        assertEquals(1, snapshot.first!!.size)
+        assertEquals("ce2adeb8-843a-4232-87a5-a099ed1e7bb3", snapshot.first!!["telemetry.valid"].toString())
     }
 
     @Test
@@ -86,7 +86,7 @@ class UuidsStorageEngineTest {
             // Get the snapshot from "store1"
             val snapshot = storageEngine.getSnapshotAsJSON(storeName = "store1", clearStore = true)
             assertEquals("{\"telemetry.uuid_metric\":\"$testUUID\"}",
-                snapshot.toString())
+                snapshot.first!!.toString())
         }
 
         // Create a new instance of storage engine to verify serialization to storage rather than
@@ -100,7 +100,7 @@ class UuidsStorageEngineTest {
             // Get the snapshot from "store1"
             val snapshot = storageEngine.getSnapshotAsJSON(storeName = "store1", clearStore = true)
             assertEquals("{\"telemetry.uuid_metric\":\"$testUUID\"}",
-                snapshot.toString())
+                snapshot.first!!.toString())
         }
     }
 
@@ -126,15 +126,15 @@ class UuidsStorageEngineTest {
         // Check that the data was correctly set in each store.
         for (storeName in storeNames) {
             val snapshot = UuidsStorageEngine.getSnapshot(storeName = storeName, clearStore = false)
-            assertEquals(1, snapshot!!.size)
-            assertEquals(uuid, snapshot.get("telemetry.uuid_metric"))
+            assertEquals(1, snapshot.first!!.size)
+            assertEquals(uuid, snapshot.first!!.get("telemetry.uuid_metric"))
         }
     }
 
     @Test
     fun `getSnapshot() returns null if nothing is recorded in the store`() {
         assertNull("The engine must report 'null' on empty or unknown stores",
-            UuidsStorageEngine.getSnapshot(storeName = "unknownStore", clearStore = false))
+            UuidsStorageEngine.getSnapshot(storeName = "unknownStore", clearStore = false).first)
     }
 
     @Test
@@ -161,13 +161,13 @@ class UuidsStorageEngineTest {
         val snapshot = UuidsStorageEngine.getSnapshot(storeName = "store1", clearStore = true)
         // Check that getting a new snapshot for "store1" returns an empty store.
         assertNull("The engine must report 'null' on empty stores",
-            UuidsStorageEngine.getSnapshot(storeName = "store1", clearStore = false))
+            UuidsStorageEngine.getSnapshot(storeName = "store1", clearStore = false).first)
 
         // Check that we get the right data from both the stores. Clearing "store1" must
         // not clear "store2" as well.
         val snapshot2 = UuidsStorageEngine.getSnapshot(storeName = "store2", clearStore = false)
         for (s in listOf(snapshot, snapshot2)) {
-            assertEquals(1, s!!.size)
+            assertEquals(1, s.first!!.size)
         }
     }
 
@@ -193,10 +193,10 @@ class UuidsStorageEngineTest {
         val snapshot = UuidsStorageEngine.getSnapshotAsJSON(storeName = "store1", clearStore = true)
         // Check that getting a new snapshot for "store1" returns an empty store.
         assertNull("The engine must report 'null' on empty stores",
-            UuidsStorageEngine.getSnapshotAsJSON(storeName = "store1", clearStore = false))
+            UuidsStorageEngine.getSnapshotAsJSON(storeName = "store1", clearStore = false).first)
         // Check that this serializes to the expected JSON format.
         assertEquals("{\"telemetry.uuid_metric\":\"$testUUID\"}",
-            snapshot.toString())
+            snapshot.first!!.toString())
     }
 
     @Test
