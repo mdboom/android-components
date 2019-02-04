@@ -24,7 +24,7 @@ data class UuidMetricType(
     override val lifetime: Lifetime,
     override val name: String,
     override val sendInPings: List<String>
-) : CommonMetricData {
+) : CommonMetricData<UuidMetricType> {
 
     override val defaultStorageDestinations: List<String> = listOf("metrics")
 
@@ -67,5 +67,15 @@ data class UuidMetricType(
                 value = value
             )
         }
+    }
+
+    override fun getWithName(newName: String): UuidMetricType {
+        return UuidMetricType(
+            disabled = disabled,
+            category = category,
+            lifetime = lifetime,
+            name = newName,
+            sendInPings = sendInPings
+        )
     }
 }

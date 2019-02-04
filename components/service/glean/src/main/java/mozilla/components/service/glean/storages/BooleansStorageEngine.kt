@@ -45,8 +45,8 @@ internal open class BooleansStorageEngineImplementation(
      * @param value the boolean value to record
      */
     @Synchronized
-    fun record(
-        metricData: CommonMetricData,
+    fun <T> record(
+        metricData: CommonMetricData<T>,
         value: Boolean
     ) {
         super.recordScalar(metricData, value)

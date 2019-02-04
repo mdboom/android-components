@@ -81,7 +81,7 @@ abstract class GenericScalarStorageEngine<ScalarType> : StorageEngine {
      * Helper function to return the name of the stored metric.
      * This is used to support empty categories.
      */
-    protected fun getStoredName(metricData: CommonMetricData): String {
+    protected fun <T> getStoredName(metricData: CommonMetricData<T>): String {
         with(metricData) {
             return if (category.isEmpty()) {
                 name
@@ -134,6 +134,10 @@ abstract class GenericScalarStorageEngine<ScalarType> : StorageEngine {
         return prefs
     }
 
+    fun isLabeledMetric(key: String): Boolean {
+        return key[0] == '#'
+    }
+
     /**
      * Retrieves the [recorded metric data][ScalarType] for the provided
      * store name.
@@ -164,7 +168,8 @@ abstract class GenericScalarStorageEngine<ScalarType> : StorageEngine {
         // Get the metrics for all the supported lifetimes.
         for (store in dataStores) {
             store[storeName]?.let {
-                allLifetimes.putAll(it)
+                it.filter { !isLabeledMetric(it.key) }
+                    .map { allLifetimes.put(it.key, it.value) }
             }
         }
 
@@ -198,8 +203,8 @@ abstract class GenericScalarStorageEngine<ScalarType> : StorageEngine {
      * @param metricData the information about the metric
      * @param value the new value
      */
-    protected fun recordScalar(
-        metricData: CommonMetricData,
+    protected fun <T> recordScalar(
+        metricData: CommonMetricData<T>,
         value: ScalarType
     ) = recordScalar(metricData, value) { _, v -> v }
 
@@ -213,8 +218,8 @@ abstract class GenericScalarStorageEngine<ScalarType> : StorageEngine {
      * @param combine a lambda function to combine the currently stored value and
      *        the new one; this allows to implement new behaviours such as adding.
      */
-    protected fun recordScalar(
-        metricData: CommonMetricData,
+    protected fun <T> recordScalar(
+        metricData: CommonMetricData<T>,
         value: ScalarType,
         extraSerializationData: Any? = null,
         combine: ScalarRecordingCombiner<ScalarType>

@@ -50,8 +50,8 @@ internal open class UuidsStorageEngineImplementation(
      * @param value the uuid value to record
      */
     @Synchronized
-    fun record(
-        metricData: CommonMetricData,
+    fun <T> record(
+        metricData: CommonMetricData<T>,
         value: UUID
     ) {
         super.recordScalar(metricData, value)

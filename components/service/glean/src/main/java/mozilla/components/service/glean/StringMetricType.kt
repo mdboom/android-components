@@ -23,7 +23,7 @@ data class StringMetricType(
     override val lifetime: Lifetime,
     override val name: String,
     override val sendInPings: List<String>
-) : CommonMetricData {
+) : CommonMetricData<StringMetricType> {
 
     override val defaultStorageDestinations: List<String> = listOf("metrics")
 
@@ -62,5 +62,15 @@ data class StringMetricType(
                 value = truncatedValue
             )
         }
+    }
+
+    override fun getWithName(newName: String): StringMetricType {
+        return StringMetricType(
+            disabled = disabled,
+            category = category,
+            lifetime = lifetime,
+            name = newName,
+            sendInPings = sendInPings
+        )
     }
 }

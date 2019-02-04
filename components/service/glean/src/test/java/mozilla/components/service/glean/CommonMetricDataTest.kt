@@ -20,7 +20,7 @@ data class TestOnlyMetricType(
     override val lifetime: Lifetime,
     override val name: String,
     override val sendInPings: List<String>
-) : CommonMetricData {
+) : CommonMetricData<TestOnlyMetricType> {
 
     override val defaultStorageDestinations: List<String> = listOf("translated_default")
 }

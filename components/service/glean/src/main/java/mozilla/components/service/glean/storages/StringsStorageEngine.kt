@@ -45,8 +45,8 @@ internal open class StringsStorageEngineImplementation(
      * @param value the string value to record
      */
     @Synchronized
-    fun record(
-        metricData: CommonMetricData,
+    fun <T> record(
+        metricData: CommonMetricData<T>,
         value: String
     ) {
         super.recordScalar(metricData, value)

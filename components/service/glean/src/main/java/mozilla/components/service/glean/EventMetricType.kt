@@ -25,7 +25,7 @@ data class EventMetricType(
     override val sendInPings: List<String>,
     val objects: List<String>,
     val allowedExtraKeys: List<String>? = null
-) : CommonMetricData {
+) : CommonMetricData<EventMetricType> {
 
     override val defaultStorageDestinations: List<String> = listOf("events")
 

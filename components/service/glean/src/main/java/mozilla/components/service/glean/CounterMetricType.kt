@@ -23,7 +23,7 @@ data class CounterMetricType(
     override val lifetime: Lifetime,
     override val name: String,
     override val sendInPings: List<String>
-) : CommonMetricData {
+) : CommonMetricData<CounterMetricType> {
 
     override val defaultStorageDestinations: List<String> = listOf("metrics")
 
@@ -54,5 +54,15 @@ data class CounterMetricType(
                     amount = amount
             )
         }
+    }
+
+    override fun getWithName(newName: String): CounterMetricType {
+        return CounterMetricType(
+            disabled = disabled,
+            category = category,
+            lifetime = lifetime,
+            name = newName,
+            sendInPings = sendInPings
+        )
     }
 }

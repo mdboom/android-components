@@ -48,8 +48,8 @@ internal open class CountersStorageEngineImplementation(
      * no current value, then the amount will be stored as the current value.
      */
     @Synchronized
-    fun record(
-        metricData: CommonMetricData,
+    fun <T> record(
+        metricData: CommonMetricData<T>,
         amount: Int
     ) {
         // Use a custom combiner to add the amount to the existing counters rather than overwriting

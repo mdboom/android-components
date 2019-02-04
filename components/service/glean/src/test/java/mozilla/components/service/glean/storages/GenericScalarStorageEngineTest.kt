@@ -44,8 +44,8 @@ class GenericScalarStorageEngineTest {
             userPreferences?.putInt(storeName, value)
         }
 
-        fun record(
-            metricData: CommonMetricData,
+        fun <T> record(
+            metricData: CommonMetricData<T>,
             value: Int
         ) {
             super.recordScalar(metricData, value)
@@ -58,7 +58,7 @@ class GenericScalarStorageEngineTest {
         override val lifetime: Lifetime,
         override val name: String,
         override val sendInPings: List<String>
-    ) : CommonMetricData {
+    ) : CommonMetricData<GenericMetricType> {
         override val defaultStorageDestinations: List<String> = listOf("metrics")
     }
 

@@ -33,7 +33,7 @@ class TimespansStorageEngineTest {
         override val name: String,
         override val sendInPings: List<String>,
         override val defaultStorageDestinations: List<String> = listOf()
-    ) : CommonMetricData
+    ) : CommonMetricData<TestMetricData>
 
     /**
      * Helper that returns a spied mocked engine.

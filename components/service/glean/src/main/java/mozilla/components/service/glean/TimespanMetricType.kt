@@ -22,7 +22,7 @@ data class TimespanMetricType(
     override val name: String,
     override val sendInPings: List<String>,
     val timeUnit: TimeUnit
-) : CommonMetricData {
+) : CommonMetricData<TimespanMetricType> {
 
     override val defaultStorageDestinations: List<String> = listOf("metrics")
 
@@ -62,5 +62,16 @@ data class TimespanMetricType(
         }
 
         TimespansStorageEngine.cancel(this)
+    }
+
+    override fun getWithName(newName: String): TimespanMetricType {
+        return TimespanMetricType(
+            disabled = disabled,
+            category = category,
+            lifetime = lifetime,
+            name = newName,
+            sendInPings = sendInPings,
+            timeUnit = timeUnit
+        )
     }
 }

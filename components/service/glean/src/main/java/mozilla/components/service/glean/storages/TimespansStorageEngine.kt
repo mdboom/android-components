@@ -137,7 +137,7 @@ internal open class TimespansStorageEngineImplementation(
      *
      * @param metricData the metric information for the timespan
      */
-    fun start(metricData: CommonMetricData) {
+    fun <T> start(metricData: CommonMetricData<T>) {
         val timespanName = getStoredName(metricData)
 
         if (timespanName in uncommittedStartTimes) {
@@ -159,8 +159,8 @@ internal open class TimespansStorageEngineImplementation(
      * @param timeUnit the time unit we want the data in when snapshotting
      */
     @Synchronized
-    fun stopAndSum(
-        metricData: CommonMetricData,
+    fun <T> stopAndSum(
+        metricData: CommonMetricData<T>,
         timeUnit: TimeUnit
     ) {
         // TODO report errors if not tracking time through internal metrics. See bug 1499761.
@@ -189,7 +189,7 @@ internal open class TimespansStorageEngineImplementation(
      * @param metricData the metric information for the timespan
      */
     @Synchronized
-    fun cancel(metricData: CommonMetricData) {
+    fun <T> cancel(metricData: CommonMetricData<T>) {
         uncommittedStartTimes.remove(getStoredName(metricData))
     }
 

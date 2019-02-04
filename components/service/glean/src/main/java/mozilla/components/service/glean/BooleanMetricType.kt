@@ -22,7 +22,7 @@ data class BooleanMetricType(
     override val lifetime: Lifetime,
     override val name: String,
     override val sendInPings: List<String>
-) : CommonMetricData {
+) : CommonMetricData<BooleanMetricType> {
 
     override val defaultStorageDestinations: List<String> = listOf("metrics")
 
@@ -47,5 +47,16 @@ data class BooleanMetricType(
                 value = value
             )
         }
+    }
+
+    override fun getWithName(newName: String): BooleanMetricType {
+        return BooleanMetricType(
+            name = newName,
+            category = category,
+            lifetime = lifetime,
+            disabled = disabled,
+            sendInPings = sendInPings
+
+        )
     }
 }

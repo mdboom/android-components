@@ -28,7 +28,7 @@ enum class Lifetime {
  * This defines the common set of data shared across all the different
  * metric types.
  */
-interface CommonMetricData {
+interface CommonMetricData<T> {
     val disabled: Boolean
     val category: String
     val lifetime: Lifetime
@@ -73,5 +73,9 @@ interface CommonMetricData {
 
         val filteredNames = sendInPings.filter { it != DEFAULT_STORAGE_NAME }
         return filteredNames + defaultStorageDestinations
+    }
+
+    fun getWithName(name: String): T {
+        throw IllegalStateException("This metric may not be used as a labeled metric")
     }
 }

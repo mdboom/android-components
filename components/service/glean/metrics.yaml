@@ -145,3 +145,16 @@ glean.internal.metrics:
     notification_emails:
     - telemetry-client-dev@mozilla.com
 
+test:
+  labeled:
+    type: counter
+    labeled: true
+    description: |
+      The user visible version string (e.g. "1.0.3").
+    bugs:
+    - 1508305
+    data_reviews:
+    - https://bugzilla.mozilla.org/show_bug.cgi?id=1508305#c9
+    notification_emails:
+    - telemetry-client-dev@mozilla.com
+

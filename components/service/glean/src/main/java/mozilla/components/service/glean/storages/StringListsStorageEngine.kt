@@ -73,8 +73,8 @@ internal open class StringListsStorageEngineImplementation(
      * @param value the string list value to add
      */
     @Synchronized
-    fun add(
-        metricData: CommonMetricData,
+    fun <T> add(
+        metricData: CommonMetricData<T>,
         value: String
     ) {
         // Use a custom combiner to add the string to the existing list rather than overwriting
@@ -100,8 +100,8 @@ internal open class StringListsStorageEngineImplementation(
      * @param value the string list value to record
      */
     @Synchronized
-    fun set(
-        metricData: CommonMetricData,
+    fun <T> set(
+        metricData: CommonMetricData<T>,
         value: List<String>
     ) {
         if (value.count() > MAX_LIST_LENGTH_VALUE) {
