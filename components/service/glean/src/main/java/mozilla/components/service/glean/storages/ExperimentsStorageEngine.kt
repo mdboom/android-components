@@ -114,11 +114,11 @@ internal object ExperimentsStorageEngine : StorageEngine {
     override fun getSnapshotAsJSON(
         @Suppress("UNUSED_PARAMETER") storeName: String,
         @Suppress("UNUSED_PARAMETER") clearStore: Boolean
-    ): Pair<Any?, Any?> {
+    ): StorageEngine.JsonSnapshot {
         val pingExperiments = getSnapshot()
 
         if (pingExperiments.count() == 0) {
-            return Pair(null, null)
+            return StorageEngine.JsonSnapshot(null, null)
         }
 
         val experimentsMap = JSONObject()
@@ -130,7 +130,7 @@ internal object ExperimentsStorageEngine : StorageEngine {
             }
             experimentsMap.put(key, experimentData)
         }
-        return Pair(experimentsMap, null)
+        return StorageEngine.JsonSnapshot(experimentsMap, null)
     }
 
     override val sendAsTopLevelField: Boolean

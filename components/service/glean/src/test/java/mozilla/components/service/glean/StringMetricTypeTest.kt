@@ -66,17 +66,17 @@ class StringMetricTypeTest {
         stringMetric.set("value")
 
         // Check that data was properly recorded.
-        val snapshot = StringsStorageEngine.getSnapshot(storeName = "store1", clearStore = false)
-        assertEquals(1, snapshot.first!!.size)
-        assertEquals(true, snapshot.first!!.containsKey("telemetry.string_metric"))
-        assertEquals("value", snapshot.first!!.get("telemetry.string_metric"))
+        val snapshot = StringsStorageEngine.getSnapshot(storeName = "store1", clearStore = false).metrics!!
+        assertEquals(1, snapshot.size)
+        assertEquals(true, snapshot.containsKey("telemetry.string_metric"))
+        assertEquals("value", snapshot.get("telemetry.string_metric"))
 
         stringMetric.set("overriddenValue")
         // Check that data was properly recorded.
-        val snapshot2 = StringsStorageEngine.getSnapshot(storeName = "store1", clearStore = false)
-        assertEquals(1, snapshot2.first!!.size)
-        assertEquals(true, snapshot2.first!!.containsKey("telemetry.string_metric"))
-        assertEquals("overriddenValue", snapshot2.first!!.get("telemetry.string_metric"))
+        val snapshot2 = StringsStorageEngine.getSnapshot(storeName = "store1", clearStore = false).metrics!!
+        assertEquals(1, snapshot2.size)
+        assertEquals(true, snapshot2.containsKey("telemetry.string_metric"))
+        assertEquals("overriddenValue", snapshot2.get("telemetry.string_metric"))
     }
 
     @Test
@@ -92,12 +92,12 @@ class StringMetricTypeTest {
 
         stringMetric.set("0123456789012345678901234567890123456789012345678901234567890123456789")
         // Check that data was truncated.
-        val snapshot = StringsStorageEngine.getSnapshot(storeName = "store1", clearStore = false)
-        assertEquals(1, snapshot.first!!.size)
-        assertEquals(true, snapshot.first!!.containsKey("telemetry.string_metric"))
+        val snapshot = StringsStorageEngine.getSnapshot(storeName = "store1", clearStore = false).metrics!!
+        assertEquals(1, snapshot.size)
+        assertEquals(true, snapshot.containsKey("telemetry.string_metric"))
         assertEquals(
             "01234567890123456789012345678901234567890123456789",
-            snapshot.first!!.get("telemetry.string_metric")
+            snapshot.get("telemetry.string_metric")
         )
     }
 
@@ -117,7 +117,7 @@ class StringMetricTypeTest {
         stringMetric.set("value")
         // Check that nothing was recorded.
         val snapshot = StringsStorageEngine.getSnapshot(storeName = "store1", clearStore = false)
-        assertNull("Strings must not be recorded if they are disabled", snapshot.first)
+        assertNull("Strings must not be recorded if they are disabled", snapshot.metrics)
     }
 
     @Test
@@ -136,6 +136,6 @@ class StringMetricTypeTest {
         stringMetric.set("value")
         // Check that nothing was recorded.
         val snapshot = StringsStorageEngine.getSnapshot(storeName = "store1", clearStore = false)
-        assertNull("Strings must not be recorded if they are disabled", snapshot.first)
+        assertNull("Strings must not be recorded if they are disabled", snapshot.metrics)
     }
 }

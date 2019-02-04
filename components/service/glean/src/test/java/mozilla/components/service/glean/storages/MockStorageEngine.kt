@@ -19,8 +19,11 @@ internal class MockStorageEngine(
 ) : StorageEngine {
     override lateinit var applicationContext: Context
 
-    override fun getSnapshotAsJSON(storeName: String, clearStore: Boolean): Pair<Any?, Any?> {
+    override fun getSnapshotAsJSON(storeName: String, clearStore: Boolean): StorageEngine.JsonSnapshot {
         Assert.assertTrue(clearStore)
-        return if (storeName == sampleStore) Pair(sampleJSON, null) else Pair(null, null)
+        return if (storeName == sampleStore)
+            StorageEngine.JsonSnapshot(sampleJSON, null)
+        else
+            StorageEngine.JsonSnapshot(null, null)
     }
 }

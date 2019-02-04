@@ -67,18 +67,18 @@ class CounterMetricTypeTest {
         counterMetric.add()
 
         // Check that the count was incremented and properly recorded.
-        val snapshot = CountersStorageEngine.getSnapshot(storeName = "store1", clearStore = false)
-        assertEquals(1, snapshot.first!!.size)
-        assertEquals(true, snapshot.first!!.containsKey("telemetry.counter_metric"))
-        assertEquals(1, snapshot.first!!["telemetry.counter_metric"])
+        val snapshot = CountersStorageEngine.getSnapshot(storeName = "store1", clearStore = false).metrics!!
+        assertEquals(1, snapshot.size)
+        assertEquals(true, snapshot.containsKey("telemetry.counter_metric"))
+        assertEquals(1, snapshot["telemetry.counter_metric"])
 
         counterMetric.add(10)
         // Check that count was incremented and properly recorded.  This second call will check
         // calling add() with 10 to test increment by other amount
-        val snapshot2 = CountersStorageEngine.getSnapshot(storeName = "store1", clearStore = false)
-        assertEquals(1, snapshot2.first!!.size)
-        assertEquals(true, snapshot2.first!!.containsKey("telemetry.counter_metric"))
-        assertEquals(11, snapshot2.first!!["telemetry.counter_metric"])
+        val snapshot2 = CountersStorageEngine.getSnapshot(storeName = "store1", clearStore = false).metrics!!
+        assertEquals(1, snapshot2.size)
+        assertEquals(true, snapshot2.containsKey("telemetry.counter_metric"))
+        assertEquals(11, snapshot2["telemetry.counter_metric"])
     }
 
     @Test
@@ -97,7 +97,7 @@ class CounterMetricTypeTest {
         counterMetric.add(1)
         // Check that nothing was recorded.
         val snapshot = CountersStorageEngine.getSnapshot(storeName = "store1", clearStore = false)
-        assertNull("Counters must not be recorded if they are disabled", snapshot.first)
+        assertNull("Counters must not be recorded if they are disabled", snapshot.metrics)
     }
 
     @Test
@@ -115,13 +115,13 @@ class CounterMetricTypeTest {
         counterMetric.add(0)
         // Check that nothing was recorded.
         var snapshot = CountersStorageEngine.getSnapshot(storeName = "store1", clearStore = false)
-        assertNull("Counters must not be recorded if incremented with zero", snapshot.first)
+        assertNull("Counters must not be recorded if incremented with zero", snapshot.metrics)
 
         // Attempt to increment the counter with negative
         counterMetric.add(-1)
         // Check that nothing was recorded.
         snapshot = CountersStorageEngine.getSnapshot(storeName = "store1", clearStore = false)
-        assertNull("Counters must not be recorded if incremented with negative", snapshot.first)
+        assertNull("Counters must not be recorded if incremented with negative", snapshot.metrics)
     }
 
     @Test
@@ -140,6 +140,6 @@ class CounterMetricTypeTest {
         counterMetric.add()
         // Check that nothing was recorded.
         val snapshot = CountersStorageEngine.getSnapshot(storeName = "store1", clearStore = false)
-        assertNull("Counters must not be recorded if they are disabled", snapshot.first)
+        assertNull("Counters must not be recorded if they are disabled", snapshot.metrics)
     }
 }

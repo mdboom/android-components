@@ -146,6 +146,11 @@ abstract class GenericScalarStorageEngine<ScalarType> : StorageEngine {
         )
     }
 
+    data class Snapshot<ScalarType>(
+        val metrics: GenericDataStorage<ScalarType>?,
+        val labeledMetrics: GenericDataStorage<MutableMap<String, ScalarType>>?
+    ) {}
+
     /**
      * Retrieves the [recorded metric data][ScalarType] for the provided
      * store name.
@@ -161,8 +166,7 @@ abstract class GenericScalarStorageEngine<ScalarType> : StorageEngine {
      * @return the [ScalarType] recorded in the requested store
      */
     @Synchronized
-    fun getSnapshot(storeName: String, clearStore: Boolean):
-        Pair<GenericDataStorage<ScalarType>?, GenericDataStorage<MutableMap<String, ScalarType>>?> {
+    fun getSnapshot(storeName: String, clearStore: Boolean): Snapshot<ScalarType> {
         val allLifetimes: GenericDataStorage<ScalarType> = mutableMapOf()
         val labeledAllLifetimes: GenericDataStorage<MutableMap<String, ScalarType>> = mutableMapOf()
 
@@ -197,7 +201,7 @@ abstract class GenericScalarStorageEngine<ScalarType> : StorageEngine {
             dataStores[Lifetime.Ping.ordinal].remove(storeName)
         }
 
-        return Pair(
+        return Snapshot<ScalarType>(
             if (allLifetimes.isNotEmpty()) allLifetimes else null,
             if (labeledAllLifetimes.isNotEmpty()) labeledAllLifetimes else null
         )
@@ -211,11 +215,11 @@ abstract class GenericScalarStorageEngine<ScalarType> : StorageEngine {
      *
      * @return the [JSONObject] containing the recorded data.
      */
-    override fun getSnapshotAsJSON(storeName: String, clearStore: Boolean): Pair<Any?, Any?> {
+    override fun getSnapshotAsJSON(storeName: String, clearStore: Boolean): StorageEngine.JsonSnapshot {
         val snapshot = getSnapshot(storeName, clearStore)
-        return Pair(
-            if (snapshot.first !== null) JSONObject(snapshot.first) else null,
-            if (snapshot.second !== null) JSONObject(snapshot.second) else null
+        return StorageEngine.JsonSnapshot(
+            if (snapshot.metrics !== null) JSONObject(snapshot.metrics) else null,
+            if (snapshot.labeledMetrics !== null) JSONObject(snapshot.labeledMetrics) else null
         )
     }
 

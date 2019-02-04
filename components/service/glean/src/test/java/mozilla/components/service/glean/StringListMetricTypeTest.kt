@@ -72,22 +72,22 @@ class StringListMetricTypeTest {
         stringListMetric.add("value3")
 
         // Check that data was properly recorded.
-        val snapshot = StringListsStorageEngine.getSnapshot("store1", false)
-        assertEquals(1, snapshot.first!!.size)
-        assertEquals(true, snapshot.first!!.containsKey("telemetry.string_list_metric"))
-        assertEquals("value1", snapshot.first!!["telemetry.string_list_metric"]?.get(0))
-        assertEquals("value2", snapshot.first!!["telemetry.string_list_metric"]?.get(1))
-        assertEquals("value3", snapshot.first!!["telemetry.string_list_metric"]?.get(2))
+        val snapshot = StringListsStorageEngine.getSnapshot("store1", false).metrics!!
+        assertEquals(1, snapshot.size)
+        assertEquals(true, snapshot.containsKey("telemetry.string_list_metric"))
+        assertEquals("value1", snapshot["telemetry.string_list_metric"]?.get(0))
+        assertEquals("value2", snapshot["telemetry.string_list_metric"]?.get(1))
+        assertEquals("value3", snapshot["telemetry.string_list_metric"]?.get(2))
 
         // Use set() to see that the first list is replaced by the new list
         stringListMetric.set(listOf("other1", "other2", "other3"))
         // Check that data was properly recorded.
-        val snapshot2 = StringListsStorageEngine.getSnapshot("store1", false)
-        assertEquals(1, snapshot2.first!!.size)
-        assertEquals(true, snapshot2.first!!.containsKey("telemetry.string_list_metric"))
-        assertEquals("other1", snapshot2.first!!["telemetry.string_list_metric"]?.get(0))
-        assertEquals("other2", snapshot2.first!!["telemetry.string_list_metric"]?.get(1))
-        assertEquals("other3", snapshot2.first!!["telemetry.string_list_metric"]?.get(2))
+        val snapshot2 = StringListsStorageEngine.getSnapshot("store1", false).metrics!!
+        assertEquals(1, snapshot2.size)
+        assertEquals(true, snapshot2.containsKey("telemetry.string_list_metric"))
+        assertEquals("other1", snapshot2["telemetry.string_list_metric"]?.get(0))
+        assertEquals("other2", snapshot2["telemetry.string_list_metric"]?.get(1))
+        assertEquals("other3", snapshot2["telemetry.string_list_metric"]?.get(2))
     }
 
     @Test
@@ -105,23 +105,23 @@ class StringListMetricTypeTest {
         stringListMetric.set(listOf("value1", "value2", "value3"))
 
         // Check that data was properly recorded.
-        val snapshot = StringListsStorageEngine.getSnapshot("store1", false)
-        assertEquals(1, snapshot.first!!.size)
-        assertEquals(true, snapshot.first!!.containsKey("telemetry.string_list_metric"))
-        assertEquals("value1", snapshot.first!!["telemetry.string_list_metric"]?.get(0))
-        assertEquals("value2", snapshot.first!!["telemetry.string_list_metric"]?.get(1))
-        assertEquals("value3", snapshot.first!!["telemetry.string_list_metric"]?.get(2))
+        val snapshot = StringListsStorageEngine.getSnapshot("store1", false).metrics!!
+        assertEquals(1, snapshot.size)
+        assertEquals(true, snapshot.containsKey("telemetry.string_list_metric"))
+        assertEquals("value1", snapshot["telemetry.string_list_metric"]?.get(0))
+        assertEquals("value2", snapshot["telemetry.string_list_metric"]?.get(1))
+        assertEquals("value3", snapshot["telemetry.string_list_metric"]?.get(2))
 
         // Use set() to see that the first list is replaced by the new list
         stringListMetric.add("added1")
         // Check that data was properly recorded.
-        val snapshot2 = StringListsStorageEngine.getSnapshot("store1", false)
-        assertEquals(1, snapshot2.first!!.size)
-        assertEquals(true, snapshot2.first!!.containsKey("telemetry.string_list_metric"))
-        assertEquals("value1", snapshot2.first!!["telemetry.string_list_metric"]?.get(0))
-        assertEquals("value2", snapshot2.first!!["telemetry.string_list_metric"]?.get(1))
-        assertEquals("value3", snapshot2.first!!["telemetry.string_list_metric"]?.get(2))
-        assertEquals("added1", snapshot2.first!!["telemetry.string_list_metric"]?.get(3))
+        val snapshot2 = StringListsStorageEngine.getSnapshot("store1", false).metrics!!
+        assertEquals(1, snapshot2.size)
+        assertEquals(true, snapshot2.containsKey("telemetry.string_list_metric"))
+        assertEquals("value1", snapshot2["telemetry.string_list_metric"]?.get(0))
+        assertEquals("value2", snapshot2["telemetry.string_list_metric"]?.get(1))
+        assertEquals("value3", snapshot2["telemetry.string_list_metric"]?.get(2))
+        assertEquals("added1", snapshot2["telemetry.string_list_metric"]?.get(3))
     }
 
     @Test
@@ -139,22 +139,22 @@ class StringListMetricTypeTest {
 
         // Check that data was truncated via add() method.
         stringListMetric.add(longString)
-        var snapshot = StringListsStorageEngine.getSnapshot("store1", false)
-        assertEquals(1, snapshot.first!!.size)
-        assertEquals(true, snapshot.first!!.containsKey("telemetry.string_list_metric"))
+        var snapshot = StringListsStorageEngine.getSnapshot("store1", false).metrics!!
+        assertEquals(1, snapshot.size)
+        assertEquals(true, snapshot.containsKey("telemetry.string_list_metric"))
         assertEquals(
             longString.take(MAX_STRING_LENGTH),
-            snapshot.first!!["telemetry.string_list_metric"]?.get(0)
+            snapshot["telemetry.string_list_metric"]?.get(0)
         )
 
         // Check that data was truncated via set() method.
         stringListMetric.set(listOf(longString))
-        snapshot = StringListsStorageEngine.getSnapshot("store1", false)
-        assertEquals(1, snapshot.first!!.size)
-        assertEquals(true, snapshot.first!!.containsKey("telemetry.string_list_metric"))
+        snapshot = StringListsStorageEngine.getSnapshot("store1", false).metrics!!
+        assertEquals(1, snapshot.size)
+        assertEquals(true, snapshot.containsKey("telemetry.string_list_metric"))
         assertEquals(
             longString.take(MAX_STRING_LENGTH),
-            snapshot.first!!["telemetry.string_list_metric"]?.get(0)
+            snapshot["telemetry.string_list_metric"]?.get(0)
         )
     }
 
@@ -174,12 +174,12 @@ class StringListMetricTypeTest {
         }
 
         // Check that list was truncated.
-        val snapshot = StringListsStorageEngine.getSnapshot("store1", false)
-        assertEquals(1, snapshot.first!!.size)
-        assertEquals(true, snapshot.first!!.containsKey("telemetry.string_list_metric"))
+        val snapshot = StringListsStorageEngine.getSnapshot("store1", false).metrics!!
+        assertEquals(1, snapshot.size)
+        assertEquals(true, snapshot.containsKey("telemetry.string_list_metric"))
         assertEquals(
             StringListsStorageEngineImplementation.MAX_LIST_LENGTH_VALUE,
-            snapshot.first!!["telemetry.string_list_metric"]?.count()
+            snapshot["telemetry.string_list_metric"]?.count()
         )
     }
 
@@ -199,13 +199,13 @@ class StringListMetricTypeTest {
         stringListMetric.set(listOf("value1", "value2", "value3"))
         // Check that nothing was recorded.
         val snapshot = StringListsStorageEngine.getSnapshot("store1", false)
-        assertNull("StringLists must not be recorded if they are disabled", snapshot.first)
+        assertNull("StringLists must not be recorded if they are disabled", snapshot.metrics)
 
         // Attempt to store the stringlist using add.
         stringListMetric.add("value4")
         // Check that nothing was recorded.
         val snapshot2 = StringListsStorageEngine.getSnapshot("store1", false)
-        assertNull("StringLists must not be recorded if they are disabled", snapshot2.first)
+        assertNull("StringLists must not be recorded if they are disabled", snapshot2.metrics)
     }
 
     @Test
@@ -224,12 +224,12 @@ class StringListMetricTypeTest {
         stringListMetric.set(listOf("value1", "value2", "value3"))
         // Check that nothing was recorded.
         val snapshot = StringListsStorageEngine.getSnapshot("store1", false)
-        assertNull("StringLists must not be recorded if they are disabled", snapshot.first)
+        assertNull("StringLists must not be recorded if they are disabled", snapshot.metrics)
 
         // Attempt to store the string list using add.
         stringListMetric.add("value4")
         // Check that nothing was recorded.
         val snapshot2 = StringListsStorageEngine.getSnapshot("store1", false)
-        assertNull("StringLists must not be recorded if they are disabled", snapshot2.first)
+        assertNull("StringLists must not be recorded if they are disabled", snapshot2.metrics)
     }
 }

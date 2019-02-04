@@ -54,9 +54,9 @@ class StringsStorageEngineTest {
         )).thenReturn(sharedPreferences)
 
         storageEngine.applicationContext = context
-        val snapshot = storageEngine.getSnapshot(storeName = "store1", clearStore = true)
-        assertEquals(1, snapshot.first!!.size)
-        assertEquals("test", snapshot.first!!["telemetry.valid"])
+        val snapshot = storageEngine.getSnapshot(storeName = "store1", clearStore = true).metrics!!
+        assertEquals(1, snapshot.size)
+        assertEquals("test", snapshot["telemetry.valid"])
     }
 
     @Test
@@ -81,10 +81,10 @@ class StringsStorageEngineTest {
 
             // Get the snapshot from "store1"
             val snapshot = storageEngine.getSnapshotAsJSON(storeName = "store1",
-                clearStore = true)
+                clearStore = true).metrics!!
             // Check that this serializes to the expected JSON format.
             assertEquals("{\"telemetry.string_metric\":\"test_string_value\"}",
-                snapshot.first!!.toString())
+                snapshot.toString())
         }
 
         // Create a new instance of storage engine to verify serialization to storage rather than
@@ -95,10 +95,10 @@ class StringsStorageEngineTest {
 
             // Get the snapshot from "store1"
             val snapshot = storageEngine.getSnapshotAsJSON(storeName = "store1",
-                clearStore = true)
+                clearStore = true).metrics!!
             // Check that this serializes to the expected JSON format.
             assertEquals("{\"telemetry.string_metric\":\"test_string_value\"}",
-                snapshot.first!!.toString())
+                snapshot.toString())
         }
     }
 
@@ -122,16 +122,16 @@ class StringsStorageEngineTest {
 
         // Check that the data was correctly set in each store.
         for (storeName in storeNames) {
-            val snapshot = StringsStorageEngine.getSnapshot(storeName = storeName, clearStore = false)
-            assertEquals(1, snapshot.first!!.size)
-            assertEquals("test_string_object", snapshot.first!!.get("telemetry.string_metric"))
+            val snapshot = StringsStorageEngine.getSnapshot(storeName = storeName, clearStore = false).metrics!!
+            assertEquals(1, snapshot.size)
+            assertEquals("test_string_object", snapshot.get("telemetry.string_metric"))
         }
     }
 
     @Test
     fun `getSnapshot() returns null if nothing is recorded in the store`() {
         assertNull("The engine must report 'null' on empty or unknown stores",
-            StringsStorageEngine.getSnapshot(storeName = "unknownStore", clearStore = false).first)
+            StringsStorageEngine.getSnapshot(storeName = "unknownStore", clearStore = false).metrics)
     }
 
     @Test
@@ -156,13 +156,13 @@ class StringsStorageEngineTest {
         val snapshot = StringsStorageEngine.getSnapshot(storeName = "store1", clearStore = true)
         // Check that getting a new snapshot for "store1" returns an empty store.
         assertNull("The engine must report 'null' on empty stores",
-            StringsStorageEngine.getSnapshot(storeName = "store1", clearStore = false).first)
+            StringsStorageEngine.getSnapshot(storeName = "store1", clearStore = false).metrics)
 
         // Check that we get the right data from both the stores. Clearing "store1" must
         // not clear "store2" as well.
         val snapshot2 = StringsStorageEngine.getSnapshot(storeName = "store2", clearStore = false)
         for (s in listOf(snapshot, snapshot2)) {
-            assertEquals(1, s.first!!.size)
+            assertEquals(1, s.metrics!!.size)
         }
     }
 
@@ -183,12 +183,12 @@ class StringsStorageEngineTest {
         )
 
         // Get the snapshot from "store1" and clear it.
-        val snapshot = StringsStorageEngine.getSnapshotAsJSON(storeName = "store1", clearStore = true)
+        val snapshot = StringsStorageEngine.getSnapshotAsJSON(storeName = "store1", clearStore = true).metrics!!
         // Check that getting a new snapshot for "store1" returns an empty store.
         assertNull("The engine must report 'null' on empty stores",
-            StringsStorageEngine.getSnapshotAsJSON(storeName = "store1", clearStore = false).first)
+            StringsStorageEngine.getSnapshotAsJSON(storeName = "store1", clearStore = false).metrics)
         // Check that this serializes to the expected JSON format.
         assertEquals("{\"telemetry.string_metric\":\"test_string_value\"}",
-            snapshot.first!!.toString())
+            snapshot.toString())
     }
 }

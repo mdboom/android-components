@@ -66,17 +66,17 @@ class BooleanMetricTypeTest {
         booleanMetric.set(true)
 
         // Check that data was properly recorded.
-        val snapshot = BooleansStorageEngine.getSnapshot(storeName = "store1", clearStore = false)
-        assertEquals(1, snapshot.first!!.size)
-        assertEquals(true, snapshot.first!!.containsKey("telemetry.boolean_metric"))
-        assertEquals(true, snapshot.first!!.get("telemetry.boolean_metric"))
+        val snapshot = BooleansStorageEngine.getSnapshot(storeName = "store1", clearStore = false).metrics!!
+        assertEquals(1, snapshot.size)
+        assertEquals(true, snapshot.containsKey("telemetry.boolean_metric"))
+        assertEquals(true, snapshot.get("telemetry.boolean_metric"))
 
         booleanMetric.set(false)
         // Check that data was properly recorded.
-        val snapshot2 = BooleansStorageEngine.getSnapshot(storeName = "store1", clearStore = false)
-        assertEquals(1, snapshot2.first!!.size)
-        assertEquals(true, snapshot2.first!!.containsKey("telemetry.boolean_metric"))
-        assertEquals(false, snapshot2.first!!.get("telemetry.boolean_metric"))
+        val snapshot2 = BooleansStorageEngine.getSnapshot(storeName = "store1", clearStore = false).metrics!!
+        assertEquals(1, snapshot2.size)
+        assertEquals(true, snapshot2.containsKey("telemetry.boolean_metric"))
+        assertEquals(false, snapshot2.get("telemetry.boolean_metric"))
     }
 
     @Test
@@ -95,6 +95,6 @@ class BooleanMetricTypeTest {
         booleanMetric.set(true)
         // Check that nothing was recorded.
         val snapshot = BooleansStorageEngine.getSnapshot(storeName = "store1", clearStore = false)
-        assertNull("Booleans must not be recorded if they are disabled", snapshot.first)
+        assertNull("Booleans must not be recorded if they are disabled", snapshot.metrics)
     }
 }

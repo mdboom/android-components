@@ -204,6 +204,11 @@ internal open class TimespansStorageEngineImplementation(
         } ?: Pair("unknown", value)
     }
 
+    internal data class Snapshot(
+        val metrics: Map<String, Pair<String, Long>>?,
+        val labeledMetrics: Map<String, Map<String, Pair<String, Long>>>?
+    ) {}
+
     /**
      * Get a snapshot of the stored timespans and adjust it to the desired time units.
      *
@@ -214,13 +219,13 @@ internal open class TimespansStorageEngineImplementation(
      * @return the [Long] recorded in the requested store
      */
     @Synchronized
-    internal fun getSnapshotWithTimeUnit(storeName: String, clearStore: Boolean): Pair<Map<String, Pair<String, Long>>?, Map<String, Map<String, Pair<String, Long>>>?> {
+    internal fun getSnapshotWithTimeUnit(storeName: String, clearStore: Boolean): Snapshot {
         val snapshot = super.getSnapshot(storeName, clearStore)
-        return Pair(
-            snapshot.first?.mapValuesTo(mutableMapOf<String, Pair<String, Long>>()) {
+        return Snapshot(
+            snapshot.metrics?.mapValuesTo(mutableMapOf<String, Pair<String, Long>>()) {
                 adjustTimeUnit(it.key, it.value)
             },
-            snapshot.second?.mapValuesTo(mutableMapOf<String, MutableMap<String, Pair<String, Long>>>()) {
+            snapshot.labeledMetrics?.mapValuesTo(mutableMapOf<String, MutableMap<String, Pair<String, Long>>>()) {
                 outer ->
                 outer.value.mapValuesTo(mutableMapOf<String, Pair<String, Long>>()) {
                     adjustTimeUnit(outer.key, it.value)
@@ -238,9 +243,9 @@ internal open class TimespansStorageEngineImplementation(
      *
      * @return the [JSONObject] containing the recorded data.
      */
-    override fun getSnapshotAsJSON(storeName: String, clearStore: Boolean): Pair<Any?, Any?> {
+    override fun getSnapshotAsJSON(storeName: String, clearStore: Boolean): StorageEngine.JsonSnapshot {
         val snapshot = getSnapshotWithTimeUnit(storeName, clearStore)
-        val unlabeled = snapshot.first?.let { 
+        val unlabeled = snapshot.metrics?.let {
             JSONObject(it.mapValuesTo(mutableMapOf<String, JSONObject>()) {
                 JSONObject(mapOf(
                     "time_unit" to it.value.first,
@@ -248,7 +253,7 @@ internal open class TimespansStorageEngineImplementation(
                 ))
             })
         }
-        val labeled = snapshot.second?.let {
+        val labeled = snapshot.labeledMetrics?.let {
             JSONObject(it.mapValuesTo(mutableMapOf<String, MutableMap<String, JSONObject>>()) {
                 it.value.mapValuesTo(mutableMapOf<String, JSONObject>()) {
                     JSONObject(mapOf(
@@ -258,7 +263,7 @@ internal open class TimespansStorageEngineImplementation(
                 }
             })
         }
-        return Pair(unlabeled, labeled)
+        return StorageEngine.JsonSnapshot(unlabeled, labeled)
     }
 
     /**

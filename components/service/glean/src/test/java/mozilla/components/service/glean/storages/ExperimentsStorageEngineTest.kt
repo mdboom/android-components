@@ -116,10 +116,10 @@ class ExperimentsStorageEngineTest {
 
         val json = ExperimentsStorageEngine.getSnapshotAsJSON(
             "test", true
-        )
+        ).metrics!!
         assertEquals(
             "{\"experiment_1\":{\"branch\":\"branch_a\"},\"experiment_2\":{\"branch\":\"branch_c\",\"extra\":{\"extra_key_1\":\"extra_val_1\"}}}",
-            json.first!!.toString()
+            json.toString()
         )
     }
 }

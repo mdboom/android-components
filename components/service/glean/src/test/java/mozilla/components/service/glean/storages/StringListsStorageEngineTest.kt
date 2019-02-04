@@ -59,10 +59,10 @@ class StringListsStorageEngineTest {
             val snapshot = StringListsStorageEngine.getSnapshot(
                 storeName = storeName,
                 clearStore = false
-            )
-            assertEquals(1, snapshot.first!!.size)
-            assertEquals("First", snapshot.first!!["telemetry.string_list_metric"]?.get(0))
-            assertEquals("Second", snapshot.first!!["telemetry.string_list_metric"]?.get(1))
+            ).metrics!!
+            assertEquals(1, snapshot.size)
+            assertEquals("First", snapshot["telemetry.string_list_metric"]?.get(0))
+            assertEquals("Second", snapshot["telemetry.string_list_metric"]?.get(1))
         }
     }
 
@@ -87,8 +87,8 @@ class StringListsStorageEngineTest {
         for (storeName in storeNames) {
             val snapshot = StringListsStorageEngine.getSnapshot(
                 storeName = storeName,
-                clearStore = false)
-            assertEquals("First", snapshot.first!!["telemetry.string_list_metric"]?.get(0))
+                clearStore = false).metrics!!
+            assertEquals("First", snapshot["telemetry.string_list_metric"]?.get(0))
         }
     }
 
@@ -112,12 +112,12 @@ class StringListsStorageEngineTest {
         // Check that list was truncated.
         val snapshot = StringListsStorageEngine.getSnapshot(
             storeName = "store1",
-            clearStore = false)
-        assertEquals(1, snapshot.first!!.size)
-        assertEquals(true, snapshot.first!!.containsKey("telemetry.string_list_metric"))
+            clearStore = false).metrics!!
+        assertEquals(1, snapshot.size)
+        assertEquals(true, snapshot.containsKey("telemetry.string_list_metric"))
         assertEquals(
             StringListsStorageEngineImplementation.MAX_LIST_LENGTH_VALUE,
-            snapshot.first!!["telemetry.string_list_metric"]?.count()
+            snapshot["telemetry.string_list_metric"]?.count()
         )
     }
 
@@ -142,12 +142,12 @@ class StringListsStorageEngineTest {
         // Check that list was added
         val snapshot = StringListsStorageEngine.getSnapshot(
             storeName = "store1",
-            clearStore = false)
-        assertEquals(1, snapshot.first!!.size)
-        assertEquals(true, snapshot.first!!.containsKey("telemetry.string_list_metric"))
+            clearStore = false).metrics!!
+        assertEquals(1, snapshot.size)
+        assertEquals(true, snapshot.containsKey("telemetry.string_list_metric"))
         assertEquals(
             StringListsStorageEngineImplementation.MAX_LIST_LENGTH_VALUE / 2,
-            snapshot.first!!["telemetry.string_list_metric"]?.count()
+            snapshot["telemetry.string_list_metric"]?.count()
         )
 
         // Add values that would exceed capacity
@@ -161,12 +161,12 @@ class StringListsStorageEngineTest {
         // Check that the list was truncated to the list capacity
         val snapshot2 = StringListsStorageEngine.getSnapshot(
             storeName = "store1",
-            clearStore = false)
-        assertEquals(1, snapshot2.first!!.size)
-        assertEquals(true, snapshot2.first!!.containsKey("telemetry.string_list_metric"))
+            clearStore = false).metrics!!
+        assertEquals(1, snapshot2.size)
+        assertEquals(true, snapshot2.containsKey("telemetry.string_list_metric"))
         assertEquals(
             StringListsStorageEngineImplementation.MAX_LIST_LENGTH_VALUE,
-            snapshot2.first!!["telemetry.string_list_metric"]?.count()
+            snapshot2["telemetry.string_list_metric"]?.count()
         )
     }
 
@@ -190,12 +190,12 @@ class StringListsStorageEngineTest {
         // Check that list was truncated.
         val snapshot = StringListsStorageEngine.getSnapshot(
             storeName = "store1",
-            clearStore = false)
-        assertEquals(1, snapshot.first!!.size)
-        assertEquals(true, snapshot.first!!.containsKey("telemetry.string_list_metric"))
+            clearStore = false).metrics!!
+        assertEquals(1, snapshot.size)
+        assertEquals(true, snapshot.containsKey("telemetry.string_list_metric"))
         assertEquals(
             StringListsStorageEngineImplementation.MAX_LIST_LENGTH_VALUE,
-            snapshot.first!!["telemetry.string_list_metric"]?.count()
+            snapshot["telemetry.string_list_metric"]?.count()
         )
     }
 
@@ -223,11 +223,11 @@ class StringListsStorageEngineTest {
         )).thenReturn(sharedPreferences)
 
         storageEngine.applicationContext = context
-        val snapshot = storageEngine.getSnapshot(storeName = "store1", clearStore = true)
+        val snapshot = storageEngine.getSnapshot(storeName = "store1", clearStore = true).metrics!!
         // Because JSONArray constructor will deserialize with or without the escaped quotes, it
         // treat the invalid_int_list above the same as the valid list, so we assertEquals 2
-        assertEquals(2, snapshot.first!!.size)
-        assertEquals(listOf("a", "b", "c"), snapshot.first!!["telemetry.valid"])
+        assertEquals(2, snapshot.size)
+        assertEquals(listOf("a", "b", "c"), snapshot["telemetry.valid"])
     }
 
     @Test
@@ -254,11 +254,11 @@ class StringListsStorageEngineTest {
             )
 
             // Get snapshot from store1
-            val json = storageEngine.getSnapshotAsJSON("store1", true)
+            val json = storageEngine.getSnapshotAsJSON("store1", true).metrics!!
             // Check for correct JSON serialization
             assertEquals(
                     "{\"telemetry.string_list_metric\":[\"First\",\"Second\"]}",
-                    json.first!!.toString()
+                    json.toString()
             )
         }
 
@@ -269,11 +269,11 @@ class StringListsStorageEngineTest {
             storageEngine.applicationContext = ApplicationProvider.getApplicationContext()
 
             // Get snapshot from store1
-            val json = storageEngine.getSnapshotAsJSON("store1", true)
+            val json = storageEngine.getSnapshotAsJSON("store1", true).metrics!!
             // Check for correct JSON serialization
             assertEquals(
                     "{\"telemetry.string_list_metric\":[\"First\",\"Second\"]}",
-                    json.first!!.toString()
+                    json.toString()
             )
         }
     }
@@ -298,14 +298,14 @@ class StringListsStorageEngineTest {
         )
 
         // Get snapshot from store1 and clear it
-        val json = StringListsStorageEngine.getSnapshotAsJSON("store1", true)
+        val json = StringListsStorageEngine.getSnapshotAsJSON("store1", true).metrics!!
         // Check that getting a new snapshot for "store1" returns an empty store.
         Assert.assertNull("The engine must report 'null' on empty stores",
-                StringListsStorageEngine.getSnapshotAsJSON(storeName = "store1", clearStore = false).first)
+                StringListsStorageEngine.getSnapshotAsJSON(storeName = "store1", clearStore = false).metrics)
         // Check for correct JSON serialization
         assertEquals(
             "{\"telemetry.string_list_metric\":[\"First\",\"Second\"]}",
-            json.first!!.toString()
+            json.toString()
         )
     }
 }

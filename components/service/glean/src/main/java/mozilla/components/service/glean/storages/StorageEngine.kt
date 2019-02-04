@@ -10,8 +10,13 @@ import android.content.Context
  * Base interface intended to be implemented by the different
  * storage engines
  */
-internal interface StorageEngine {
+interface StorageEngine {
     var applicationContext: Context
+
+    data class JsonSnapshot(
+        var metrics: Any?,
+        var labeledMetrics: Any?
+    ) {}
 
     /**
      * Get a snapshot of the stored data as a JSON object.
@@ -23,7 +28,7 @@ internal interface StorageEngine {
      *         a [JSONObject] or a [JSONArray]. Unfortunately, the only common
      *         ancestor is [Object], so we need to return [Any].
      */
-    fun getSnapshotAsJSON(storeName: String, clearStore: Boolean): Pair<Any?, Any?>
+    fun getSnapshotAsJSON(storeName: String, clearStore: Boolean): JsonSnapshot
 
     /**
      * Indicate whether this storage engine is sent at the top level of the ping
