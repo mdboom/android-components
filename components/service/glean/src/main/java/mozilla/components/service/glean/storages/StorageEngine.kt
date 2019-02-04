@@ -26,6 +26,20 @@ internal interface StorageEngine {
     fun getSnapshotAsJSON(storeName: String, clearStore: Boolean): Any?
 
     /**
+     * Get a snapshot of the stored data as a JSON object.
+     *
+     * @param storeName the name of the desired store
+     * @param clearStore whether or not to clearStore the requested store
+     *
+     * @return the JSON object containing the recorded data. This could be either
+     *         a [JSONObject] or a [JSONArray]. Unfortunately, the only common
+     *         ancestor is [Object], so we need to return [Any].
+     */
+    fun getLabeledSnapshotAsJSON(storeName: String, clearStore: Boolean): Any? {
+        return null
+    }
+
+    /**
      * Indicate whether this storage engine is sent at the top level of the ping
      * (rather than in the metrics section).
      */
