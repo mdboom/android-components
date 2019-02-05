@@ -27,7 +27,7 @@ data class LabeledMetricType<T>(
 
     private val logger = Logger("glean/LabeledMetricType")
 
-    fun get(label: String): T {
+    operator fun get(label: String): T {
         return (subMetric as CommonMetricData<T>).getWithName("#$name#$label")
     }
 }
