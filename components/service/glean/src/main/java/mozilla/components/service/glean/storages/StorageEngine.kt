@@ -6,6 +6,7 @@ package mozilla.components.service.glean.storages
 
 import android.content.Context
 import android.support.annotation.VisibleForTesting
+import mozilla.components.service.glean.CommonMetricData
 
 /**
  * Base interface intended to be implemented by the different
@@ -25,6 +26,18 @@ internal interface StorageEngine {
      *         ancestor is [Object], so we need to return [Any].
      */
     fun getSnapshotAsJSON(storeName: String, clearStore: Boolean): Any?
+
+    /**
+     * Return a set of the all the labels in use for a given labeled metric.
+     * This includes labels in all of the pings specified by the metric, and
+     * for all lifetimes.
+     *
+     * @param metricData The labeled metric to find labels for.
+     * @return The set of labels currently in use.
+     */
+    fun getLabelsForMetric(metricData: CommonMetricData): Set<String> {
+        return setOf()
+    }
 
     /**
      * Clear all stored data in the storage engine

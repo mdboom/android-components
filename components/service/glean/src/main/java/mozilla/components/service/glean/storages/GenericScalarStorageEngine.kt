@@ -37,6 +37,7 @@ internal typealias ScalarRecordingCombiner<T> = (currentValue: T?, newValue: T) 
  * A base class for 'scalar' like metrics. This allows sharing the common
  * store managing and lifetime behaviours.
  */
+@Suppress("TooManyFunctions")
 internal abstract class GenericScalarStorageEngine<ScalarType> : StorageEngine {
     override lateinit var applicationContext: Context
 
@@ -122,6 +123,21 @@ internal abstract class GenericScalarStorageEngine<ScalarType> : StorageEngine {
     }
 
     /**
+     * Ensures that the user lifetime metrics (in [userLifetimeStorage]) is
+     * loaded.  This is a no-op if they are already loaded.
+     */
+    private fun ensureUserLifetimeLoaded() {
+        // Make sure data with "user" lifetime is loaded.
+        // We still need to catch exceptions here, as `getAll()` might throw.
+        @Suppress("TooGenericExceptionCaught")
+        try {
+            userLifetimeStorage.all
+        } catch (e: NullPointerException) {
+            // Intentionally left blank. We just want to fall through.
+        }
+    }
+
+    /**
      * Retrieves the [recorded metric data][ScalarType] for the provided
      * store name.
      *
@@ -140,13 +156,7 @@ internal abstract class GenericScalarStorageEngine<ScalarType> : StorageEngine {
         val allLifetimes: GenericDataStorage<ScalarType> = mutableMapOf()
 
         // Make sure data with "user" lifetime is loaded before getting the snapshot.
-        // We still need to catch exceptions here, as `getAll()` might throw.
-        @Suppress("TooGenericExceptionCaught")
-        try {
-            userLifetimeStorage.all
-        } catch (e: NullPointerException) {
-            // Intentionally left blank. We just want to fall through.
-        }
+        ensureUserLifetimeLoaded()
 
         // Get the metrics for all the supported lifetimes.
         for (store in dataStores) {
@@ -175,6 +185,35 @@ internal abstract class GenericScalarStorageEngine<ScalarType> : StorageEngine {
         return getSnapshot(storeName, clearStore)?.let { dataMap ->
             return JSONObject(dataMap)
         }
+    }
+
+    /**
+     * Return a set of the all the labels in use for a given labeled metric.
+     * This includes labels in all of the pings specified by the metric, and
+     * for all lifetimes.
+     *
+     * @param metricData The labeled metric to find labels for.
+     * @return The set of labels currently in use.
+     */
+    @Suppress("NestedBlockDepth")
+    override fun getLabelsForMetric(metricData: CommonMetricData): Set<String> {
+        // Make sure data with "user" lifetime is loaded before getting the snapshot.
+        ensureUserLifetimeLoaded()
+
+        val prefix = "${metricData.identifier}/"
+        val labels = mutableSetOf<String>()
+        dataStores.forEach { store ->
+            metricData.getStorageNames().forEach {
+                store[it]?.let { lifetime ->
+                    lifetime.forEach {
+                        if (it.key.startsWith(prefix)) {
+                            labels.add(it.key.substring(prefix.length))
+                        }
+                    }
+                }
+            }
+        }
+        return labels
     }
 
     /**
