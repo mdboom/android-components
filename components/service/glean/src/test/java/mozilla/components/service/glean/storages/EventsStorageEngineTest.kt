@@ -417,11 +417,15 @@ class EventsStorageEngineTest {
 
         // Record the event in the store, without providing optional arguments.
         event.record(mapOf(ExtraKeys.Key1 to "bar"))
+        EventsStorageEngine.testWaitForWrites()
         // Add a couple of truncated events to disk. One is still valid JSON, the other isn't.
         // These event should be skipped, all others intact.
         EventsStorageEngine.writeEventToDisk("store1", "[500]")
+        EventsStorageEngine.testWaitForWrites()
         EventsStorageEngine.writeEventToDisk("store1", "[500, \"foo")
+        EventsStorageEngine.testWaitForWrites()
         event.record(mapOf(ExtraKeys.Key1 to "baz"))
+        EventsStorageEngine.testWaitForWrites()
         assertEquals(2, event.testGetValue().size)
 
         // Clear the in-memory storage only to mock being loaded in a fresh process
