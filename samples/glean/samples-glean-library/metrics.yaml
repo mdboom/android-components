@@ -23,4 +23,17 @@ sample_metrics:
       - N/A
     notification_emails:
       - CHANGE-ME@example.com
-    expires: 2100-01-01 
+    expires: 2100-01-01
+
+basic:
+  os:
+    type: string
+    description: >
+      The name of the os
+    bugs:
+      - 123456789
+    data_reviews:
+      - N/A
+    notification_emails:
+      - CHANGE-ME@example.com
+    expires: 2100-01-01

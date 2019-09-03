@@ -5,6 +5,7 @@
 package org.mozilla.samples.glean.library
 
 import mozilla.samples.glean.library.GleanMetrics.SampleMetrics
+import mozilla.samples.glean.library.GleanMetrics.Basic
 import mozilla.components.service.glean.Glean
 
 /**
@@ -17,6 +18,7 @@ object SamplesGleanLibrary {
      */
     fun recordMetric() {
         SampleMetrics.test.add()
+        Basic.os.set("BeOS")
     }
 
     /**
